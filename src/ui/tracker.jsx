@@ -4,7 +4,8 @@ import React from 'react';
 import { Oval } from 'react-loader-spinner';
 import { ToastContainer, toast } from 'react-toastify';
 
-import Database, { SaveDataType } from '../services/database';
+// eslint-disable-next-line import/no-unresolved, import/extensions
+import Database, { Mode, SaveDataType } from '../services/database';
 import LogicHelper from '../services/logic-helper';
 import TrackerController from '../services/tracker-controller';
 
@@ -146,11 +147,10 @@ class Tracker extends React.PureComponent {
       locationsChecked: true,
     });
 
-    const destructId = database.mode == Mode.ITEMSYNC ? database.roomId : database.userId;
+    const destructId = database.mode === Mode.ITEMSYNC ? database.roomId : database.userId;
 
-    for (const itemName in database.state.items) {
-      const userDicts = database.state.items[itemName];
-      const { count, generalLocation, detailedLocation } = userDicts[destructId];
+    _.forEach(database.state.items, (itemData, itemName) => {
+      const { count, generalLocation, detailedLocation } = itemData[destructId];
 
       _.set(newTrackerState.items, itemName, count ?? 0);
       if (generalLocation && detailedLocation) {
@@ -160,18 +160,18 @@ class Tracker extends React.PureComponent {
           detailedLocation,
         );
       }
-    }
+    });
 
-    for (const location in database.state.locations) {
+    _.forEach(database.state.locations, (locationData, location) => {
       const [generalLocation, detailedLocation] = location.split('#');
-      const { isChecked } = database.state.locations[location][destructId];
+      const { isChecked } = locationData[destructId];
 
       _.set(
         newTrackerState.locationsChecked,
         [generalLocation, detailedLocation],
         isChecked ?? false,
       );
-    }
+    });
 
     this.updateTrackerState(newTrackerState);
   }
@@ -555,6 +555,7 @@ class Tracker extends React.PureComponent {
 Tracker.propTypes = {
   loadProgress: PropTypes.bool.isRequired,
   permalink: PropTypes.string.isRequired,
+  gameId: PropTypes.string.isRequired,
 };
 
 export default Tracker;
