@@ -34,12 +34,15 @@ export default class Launcher extends React.PureComponent {
     this.state = {
       options,
       permalink,
+      gameId: '',
     };
 
     this.launchNewTracker = this.launchNewTracker.bind(this);
     this.loadFromFile = this.loadFromFile.bind(this);
     this.loadFromSave = this.loadFromSave.bind(this);
     this.setOptionValue = this.setOptionValue.bind(this);
+    this.launchOnline = this.launchOnline.bind(this);
+    this.loadFromFileLaunchOnline = this.loadFromFileLaunchOnline.bind(this);
   }
 
   getOptionValue(optionName) {
@@ -276,6 +279,20 @@ export default class Launcher extends React.PureComponent {
     Launcher.openTrackerWindow(`/new/${encodedPermalink}`);
   }
 
+  launchOnline() {
+    const encodedPermalink = this.encodedPermalink();
+    const { gameId } = this.state;
+
+    Launcher.openTrackerWindow(`/online/${encodedPermalink}/${gameId}`);
+  }
+
+  launchLoadFromFileLaunchOnline() {
+    const encodedPermalink = this.encodedPermalink();
+    const { gameId } = this.state;
+
+    Launcher.openTrackerWindow(`/load/online/${encodedPermalink}/${gameId}`);
+  }
+
   loadFromSave() {
     const encodedPermalink = this.encodedPermalink();
 
@@ -292,6 +309,12 @@ export default class Launcher extends React.PureComponent {
     await Storage.loadFileAndStore();
 
     this.loadFromSave();
+  }
+
+  async loadFromFileLaunchOnline() {
+    await Storage.loadFileAndStore();
+
+    this.launchLoadFromFileLaunchOnline();
   }
 
   launchButtonContainer() {
@@ -322,6 +345,47 @@ export default class Launcher extends React.PureComponent {
     );
   }
 
+  gameIdContainer() {
+    const { gameId } = this.state;
+
+    return (
+      <>
+        <div className="permalink-container">
+          <div className="permalink-label">GameId:</div>
+          <div className="permalink-input">
+            <input
+              placeholder="GameId"
+              className="permalink"
+              onChange={(event) => {
+                event.stopPropagation();
+                this.setState({ gameId: event.target.value });
+              }}
+              value={gameId}
+            />
+          </div>
+        </div>
+        <div className="launcher-button-container">
+          <button
+            className="launcher-button"
+            type="button"
+            onClick={this.launchOnline}
+            disabled={!gameId}
+          >
+            Launch Online
+          </button>
+          <button
+            className="launcher-button"
+            type="button"
+            onClick={this.loadFromFileLaunchOnline}
+            disabled={!gameId}
+          >
+            Load File, Launch Online
+          </button>
+        </div>
+      </>
+    );
+  }
+
   render() {
     return (
       <div className="full-container">
@@ -339,9 +403,16 @@ export default class Launcher extends React.PureComponent {
             {this.additionalRandomizationOptionsTable()}
             {this.convenienceTweaksTable()}
             {this.launchButtonContainer()}
+            {this.gameIdContainer()}
           </div>
           <div className="attribution">
-            <span>Maintained by wooferzfg • Source Code on </span>
+            <span>Maintained by Jaysc/Colfra • Source Code on </span>
+            <a href="https://github.com/jaysc/tww-rando-tracker-coop">Github</a>
+            <span> • Server code can be found </span>
+            <a href="https://github.com/jaysc/tww-rando-tracker-coop-server">here</a>
+          </div>
+          <div className="attribution">
+            <span>Based on code by wooferzfg • Source Code on </span>
             <a href="https://github.com/wooferzfg/tww-rando-tracker">GitHub</a>
             <span> • Original Tracker by BigDunka</span>
           </div>

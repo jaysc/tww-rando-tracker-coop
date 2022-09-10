@@ -1,5 +1,6 @@
 const path = require('path');
 
+const Dotenv = require('dotenv-webpack');
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const sass = require('sass');
@@ -32,12 +33,13 @@ module.exports = (env, argv) => {
       port: 8080,
     },
     resolve: {
-      extensions: ['.webpack.js', '.js', '.jsx', '.json', '.png'],
+      extensions: ['.webpack.js', '.js', '.jsx', '.json', '.png', '.ts', '.tsx'],
     },
     output: {
       clean: true,
     },
     plugins: [
+      new Dotenv({ systemvars: !!isProduction }),
       new FaviconsWebpackPlugin(faviconsWebpackPluginSettings),
       new HtmlWebpackPlugin({
         template: './src/index.html',
@@ -75,6 +77,11 @@ module.exports = (env, argv) => {
         {
           test: /\.png$/,
           type: 'asset/inline',
+        },
+        {
+          test: /\.tsx?$/,
+          use: 'ts-loader',
+          exclude: /node_modules/,
         },
       ],
     },
