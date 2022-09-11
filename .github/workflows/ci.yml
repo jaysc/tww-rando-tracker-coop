@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Add websocket serevr
-        run: echo "$env:WEBSOCKET_SERVER" > .env
+        run: echo "WEBSOCKET_SERVER=$WEBSOCKET_SERVER" > .env
         env:
           WEBSOCKET_SERVER: ${{ secrets.WEBSOCKET_SERVER }}
 
