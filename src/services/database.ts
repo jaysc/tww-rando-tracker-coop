@@ -321,6 +321,11 @@ export default class Database {
   }
 
   private onDataSaved(data: OnDataSaved) {
+    if (data.type === SaveDataType.LOCATION) {
+      _.set(this.state, ['locations', `${data.generalLocation}#${data.detailedLocation}`, data.userId, 'isChecked'], data.isChecked)
+    } else if (data.type === SaveDataType.ITEM) {
+      _.set(this.state, ['items', data.itemName, data.userId, 'count'], data.count)
+    }
     this.databaseUpdate(data);
   }
 }
