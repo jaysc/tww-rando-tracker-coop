@@ -25,12 +25,14 @@ class Buttons extends React.PureComponent {
       disableLogic,
       entrancesListOpen,
       onlyProgressLocations,
+      syncTracker,
       trackSpheres,
       toggleChartList,
       toggleColorPicker,
       toggleDisableLogic,
       toggleEntrancesList,
       toggleOnlyProgressLocations,
+      toggleSyncTracker,
       toggleTrackSpheres,
     } = this.props;
 
@@ -89,6 +91,13 @@ class Buttons extends React.PureComponent {
           Track Spheres
         </button>
         <button
+          onClick={toggleSyncTracker}
+          type="button"
+        >
+          <input type="checkbox" className="button-checkbox" checked={syncTracker} readOnly />
+          Sync Tracker
+        </button>
+        <button
           onClick={toggleColorPicker}
           type="button"
         >
@@ -106,12 +115,14 @@ Buttons.propTypes = {
   entrancesListOpen: PropTypes.bool.isRequired,
   onlyProgressLocations: PropTypes.bool.isRequired,
   saveData: PropTypes.string.isRequired,
+  syncTracker: PropTypes.bool.isRequired,
   trackSpheres: PropTypes.bool.isRequired,
   toggleChartList: PropTypes.func.isRequired,
   toggleColorPicker: PropTypes.func.isRequired,
   toggleDisableLogic: PropTypes.func.isRequired,
   toggleEntrancesList: PropTypes.func.isRequired,
   toggleOnlyProgressLocations: PropTypes.func.isRequired,
+  toggleSyncTracker: PropTypes.func.isRequired,
   toggleTrackSpheres: PropTypes.func.isRequired,
 };
 

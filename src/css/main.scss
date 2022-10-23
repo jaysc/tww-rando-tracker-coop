@@ -790,3 +790,15 @@ button:hover:enabled {
     flex-grow: 1;
   }
 }
+
+.coop-checked-item::before {
+  content: '';
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+  background-color: #69b6d5;
+  position: absolute;
+}

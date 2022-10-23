@@ -2,6 +2,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import Database from '../services/database';
 import LogicCalculation from '../services/logic-calculation';
 import LogicHelper from '../services/logic-helper';
 import Permalink from '../services/permalink';
@@ -27,33 +28,73 @@ class DetailedLocationsTable extends React.PureComponent {
     );
   }
 
-  itemTooltip(generalLocation, detailedLocation) {
+  itemTooltip(generalLocation, detailedLocation, databaseItems) {
     const { trackerState } = this.props;
 
     const itemForLocation = trackerState.getItemForLocation(generalLocation, detailedLocation);
 
-    if (_.isNil(itemForLocation)) {
-      return null;
+    let itemForLocationContent;
+    let databaseItemForLocationContent;
+    if (!_.isNil(itemForLocation)) {
+      const prettyItemName = LogicHelper.prettyNameForItem(itemForLocation, null);
+
+      let chartLeadsTo;
+      if (LogicHelper.isRandomizedChart(itemForLocation)) {
+        const mappedIslandForChart = trackerState.getIslandFromChartMapping(itemForLocation);
+        chartLeadsTo = !_.isNil(mappedIslandForChart) ? (
+          <>
+            <div className="tooltip-title">Chart Leads To</div>
+            <div>{mappedIslandForChart}</div>
+          </>
+        ) : null;
+      }
+
+      itemForLocationContent = (
+        <>
+          <div className="tooltip-title">Item at Location</div>
+          <div>{prettyItemName}</div>
+          {chartLeadsTo}
+        </>
+      );
     }
 
-    const prettyItemName = LogicHelper.prettyNameForItem(itemForLocation, null);
+    if (!_.isNil(databaseItems)) {
+      const databaseItemContent = [];
+      _.forEach(databaseItems, (itemName) => {
+        const prettyItemName = LogicHelper.prettyNameForItem(itemName, null);
 
-    let chartLeadsTo;
-    if (LogicHelper.isRandomizedChart(itemForLocation)) {
-      const mappedIslandForChart = trackerState.getIslandFromChartMapping(itemForLocation);
-      chartLeadsTo = !_.isNil(mappedIslandForChart) ? (
-        <>
-          <div className="tooltip-title">Chart Leads To</div>
-          <div>{mappedIslandForChart}</div>
-        </>
-      ) : null;
+        let chartLeadsTo;
+        if (LogicHelper.isRandomizedChart(itemName)) {
+          const mappedIslandForChart = trackerState.getIslandFromChartMapping(itemName);
+          chartLeadsTo = !_.isNil(mappedIslandForChart) ? (
+            <>
+              <div className="tooltip-title">Chart Leads To</div>
+              <div>{mappedIslandForChart}</div>
+            </>
+          ) : null;
+        }
+
+        databaseItemContent.push((
+          <div key={itemName}>
+            <div>{prettyItemName}</div>
+            {chartLeadsTo}
+          </div>));
+      });
+
+      if (databaseItemContent.length > 0) {
+        databaseItemForLocationContent = (
+          <>
+            <div className="tooltip-title">Coop Item at Location</div>
+            {databaseItemContent}
+          </>
+        );
+      }
     }
 
     return (
       <div className="tooltip">
-        <div className="tooltip-title">Item at Location</div>
-        <div>{prettyItemName}</div>
-        {chartLeadsTo}
+        {itemForLocationContent}
+        {databaseItemForLocationContent}
       </div>
     );
   }
@@ -69,6 +110,7 @@ class DetailedLocationsTable extends React.PureComponent {
     } = locationInfo;
 
     const {
+      database,
       disableLogic,
       openedLocation,
       spheres,
@@ -95,9 +137,32 @@ class DetailedLocationsTable extends React.PureComponent {
       locationText = location;
     }
 
+    const isLocationChecked = color === LogicCalculation.LOCATION_COLORS.CHECKED_LOCATION;
+
+    const isDatabaseChecked = _.some(
+      _.get(database, ['state', 'locations', Database.getLocationKey(openedLocation, location)]),
+      (value, userId) => database.userId !== userId && value.isChecked,
+    );
+    const databaseItems = _.reduce(
+      _.get(database, ['state', 'itemsForLocation', Database.getLocationKey(openedLocation, location)]),
+      (acc, itemData, userId) => {
+        if (database.userId !== userId) {
+          const { itemName } = itemData;
+          if (!acc.includes(itemName)) {
+            acc.push(itemName);
+          }
+        }
+
+        return acc;
+      },
+      [],
+    );
+
+    const cssColor = (!isLocationChecked && isDatabaseChecked)
+      ? LogicCalculation.LOCATION_COLORS.COOP_CHECKED_LOCATION : color;
     const locationElement = (
       <div
-        className={`detail-span ${color} ${fontSizeClassName}`}
+        className={`detail-span ${cssColor} ${fontSizeClassName}`}
         onClick={toggleLocationFunc}
         onKeyDown={KeyDownWrapper.onSpaceKey(toggleLocationFunc)}
         role="button"
@@ -107,13 +172,11 @@ class DetailedLocationsTable extends React.PureComponent {
       </div>
     );
 
-    const isLocationChecked = color === LogicCalculation.LOCATION_COLORS.CHECKED_LOCATION;
-
     let locationContent;
-    if (disableLogic || isLocationChecked) {
+    if (disableLogic || isLocationChecked || isDatabaseChecked) {
       let itemTooltip = null;
       if (trackSpheres) {
-        itemTooltip = this.itemTooltip(openedLocation, location);
+        itemTooltip = this.itemTooltip(openedLocation, location, databaseItems);
       }
 
       locationContent = (
@@ -233,6 +296,7 @@ class DetailedLocationsTable extends React.PureComponent {
 DetailedLocationsTable.propTypes = {
   clearOpenedMenus: PropTypes.func.isRequired,
   clearRaceModeBannedLocations: PropTypes.func.isRequired,
+  database: PropTypes.instanceOf(Database).isRequired,
   disableLogic: PropTypes.bool.isRequired,
   logic: PropTypes.instanceOf(LogicCalculation).isRequired,
   onlyProgressLocations: PropTypes.bool.isRequired,

@@ -317,34 +317,6 @@ export default class Launcher extends React.PureComponent {
     this.launchLoadFromFileLaunchOnline();
   }
 
-  launchButtonContainer() {
-    return (
-      <div className="launcher-button-container">
-        <button
-          className="launcher-button"
-          type="button"
-          onClick={this.launchNewTracker}
-        >
-          Launch New Tracker
-        </button>
-        <button
-          className="launcher-button"
-          type="button"
-          onClick={this.loadFromSave}
-        >
-          Load From Autosave
-        </button>
-        <button
-          className="launcher-button"
-          type="button"
-          onClick={this.loadFromFile}
-        >
-          Load From File
-        </button>
-      </div>
-    );
-  }
-
   gameIdContainer() {
     const { gameId } = this.state;
 
@@ -402,7 +374,6 @@ export default class Launcher extends React.PureComponent {
             {this.progressItemLocationsTable()}
             {this.additionalRandomizationOptionsTable()}
             {this.convenienceTweaksTable()}
-            {this.launchButtonContainer()}
             {this.gameIdContainer()}
           </div>
           <div className="attribution">

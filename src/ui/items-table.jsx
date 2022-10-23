@@ -2,6 +2,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import Database from '../services/database';
 import LogicHelper from '../services/logic-helper';
 import Spheres from '../services/spheres';
 import TrackerState from '../services/tracker-state';
@@ -49,6 +50,7 @@ class ItemsTable extends React.PureComponent {
 
   item(itemName, showLocationTooltip = true) {
     const {
+      database,
       decrementItem,
       incrementItem,
       spheres,
@@ -59,6 +61,46 @@ class ItemsTable extends React.PureComponent {
     const itemCount = trackerState.getItemValue(itemName);
     const itemImages = _.get(Images.IMAGES, ['ITEMS', itemName]);
 
+    const databaseMaxCount = _.reduce(
+      _.get(database, ['state', 'items', itemName]),
+      (acc, value, userId) => {
+        if (database.userId !== userId) {
+          return value.count > acc ? value.count : acc;
+        }
+        return acc;
+      },
+      0,
+    );
+
+    const databaseLocations = _.reduce(
+      _.get(database, ['state', 'itemsForLocation']),
+      (acc, data, location) => {
+        const [generalLocation, detailedLocation] = location.split('#');
+        _.forEach(data, (itemData, userId) => {
+          if (database.userId !== userId) {
+            const { itemName: databaseItemName } = itemData;
+            if (itemName === databaseItemName) {
+              acc.push({
+                generalLocation,
+                detailedLocation,
+              });
+            }
+          }
+        });
+
+        return acc;
+      },
+      [],
+    );
+
+    let databaseData;
+    if (databaseLocations.length > 0) {
+      databaseData = {
+        maxCount: databaseMaxCount,
+        locations: databaseLocations,
+      };
+    }
+
     let locations = [];
     if (showLocationTooltip && trackSpheres) {
       locations = trackerState.getLocationsForItem(itemName);
@@ -66,7 +108,9 @@ class ItemsTable extends React.PureComponent {
 
     return (
       <Item
+        className="test"
         clearSelectedItem={this.clearSelectedItem}
+        databaseData={databaseData}
         decrementItem={decrementItem}
         images={itemImages}
         incrementItem={incrementItem}
@@ -206,6 +250,7 @@ ItemsTable.defaultProps = {
 
 ItemsTable.propTypes = {
   backgroundColor: PropTypes.string,
+  database: PropTypes.instanceOf(Database).isRequired,
   decrementItem: PropTypes.func.isRequired,
   incrementItem: PropTypes.func.isRequired,
   spheres: PropTypes.instanceOf(Spheres).isRequired,

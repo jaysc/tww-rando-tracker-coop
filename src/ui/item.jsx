@@ -16,6 +16,7 @@ class Item extends React.PureComponent {
       decrementItem,
       images,
       incrementItem,
+      databaseData,
       itemCount,
       itemName,
       setSelectedItem,
@@ -48,7 +49,7 @@ class Item extends React.PureComponent {
 
     return (
       <div
-        className={`item-container ${itemClassName}`}
+        className={`item-container ${itemClassName} ${databaseData.maxCount > itemCount ? 'coop-checked-item' : ''}`}
         onBlur={clearSelectedItem}
         onClick={incrementItemFunc}
         onContextMenu={decrementItemFunc}
@@ -69,11 +70,74 @@ class Item extends React.PureComponent {
   }
 
   render() {
-    const { locations, spheres } = this.props;
+    const { databaseData, locations, spheres } = this.props;
+
+    let locationContent;
+    let databaseContent;
+    const existingLocation = [];
 
     if (!_.isEmpty(locations)) {
+      const locationsList = _.map(locations, ({
+        generalLocation, detailedLocation,
+      }) => {
+        const sphere = spheres.sphereForLocation(generalLocation, detailedLocation);
+        const sphereText = _.isNil(sphere) ? '?' : sphere;
+        const locationName = `${generalLocation} | ${detailedLocation}`;
+        existingLocation.push(locationName);
+
+        return (
+          <li key={locationName}>
+            {`[${sphereText}] ${locationName}`}
+          </li>
+        );
+      });
+
+      locationContent = (
+        <>
+          <div className="tooltip-title">Locations Found At</div>
+          <ul>{locationsList}</ul>
+        </>
+      );
+    }
+
+    if (!_.isEmpty(databaseData?.locations)) {
+      const databaseList = _.reduce(databaseData.locations, (acc, {
+        generalLocation, detailedLocation,
+      }) => {
+        const sphere = spheres.sphereForLocation(generalLocation, detailedLocation);
+        const sphereText = _.isNil(sphere) ? '?' : sphere;
+        const locationName = `${generalLocation} | ${detailedLocation}`;
+
+        if (!existingLocation.includes(locationName)) {
+          acc.push((
+            <li key={locationName}>
+              {`[${sphereText}] ${locationName}`}
+            </li>
+          ));
+        }
+
+        return acc;
+      }, []);
+
+      if (databaseList.length > 0) {
+        databaseContent = (
+          <>
+            <div className="tooltip-title">Coop Found At</div>
+            <ul>{databaseList}</ul>
+          </>
+        );
+      }
+    }
+
+    if (locationContent || databaseContent) {
+      const foundAtTooltip = (
+        <div className="tooltip item-location">
+          {locationContent}
+          {databaseContent}
+        </div>
+      );
       return (
-        <Tooltip tooltipContent={<FoundAtTooltip locations={locations} spheres={spheres} />}>
+        <Tooltip tooltipContent={foundAtTooltip}>
           {this.item()}
         </Tooltip>
       );
@@ -85,6 +149,7 @@ class Item extends React.PureComponent {
 
 Item.defaultProps = {
   decrementItem: null,
+  databaseData: {},
   locations: [],
   spheres: null,
 };
@@ -92,6 +157,13 @@ Item.defaultProps = {
 Item.propTypes = {
   clearSelectedItem: PropTypes.func.isRequired,
   decrementItem: PropTypes.func,
+  databaseData: PropTypes.exact({
+    maxCount: PropTypes.number,
+    locations: PropTypes.arrayOf(PropTypes.exact({
+      generalLocation: PropTypes.string.isRequired,
+      detailedLocation: PropTypes.string.isRequired,
+    })),
+  }),
   images: PropTypes.arrayOf(PropTypes.string).isRequired,
   incrementItem: PropTypes.func.isRequired,
   itemCount: PropTypes.number.isRequired,

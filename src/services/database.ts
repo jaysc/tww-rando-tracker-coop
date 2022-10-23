@@ -1,6 +1,6 @@
 import { v4 } from "uuid";
 import _ from "lodash";
-import { toast } from "react-toastify";
+import { Id, toast } from "react-toastify";
 
 export interface IDatabase {
   userId?: string;
@@ -28,12 +28,13 @@ export default class Database {
   mode: Mode;
   roomId: string;
   initialData: InitialData;
-  connectingToast;
-  disconnectedToast;
+  connectingToast: Id;
+  successToast: Id;
+  disconnectedToast: Id;
 
   retryInterval?: NodeJS.Timeout;
 
-  databaseInitialLoad: () => void;
+  databaseInitialLoad: (data: OnJoinedRoom) => void;
   databaseUpdate: (data: OnDataSaved) => void;
 
   state: {
@@ -41,13 +42,17 @@ export default class Database {
     locations: object;
   };
 
+  private static getLocationKey(generalLocation, detailedLocation) {
+    return `${generalLocation}#${detailedLocation}`;
+  }
+
   constructor(options: IDatabase) {
     console.log("connecting to server");
     this.gameId = options.gameId;
     this.permaId = options.permaId;
     this.databaseInitialLoad = options.databaseInitialLoad;
     this.databaseUpdate = options.databaseUpdate;
-    this.mode = options.mode ?? Mode.ITEMSYNC;
+    this.mode = options.mode ?? Mode.COOP;
     if (options.initialData) {
       const initialData: InitialData = {
         trackerState: {
@@ -136,9 +141,7 @@ export default class Database {
       this.clearConnectRetry();
       toast.dismiss(this.disconnectedToast);
       toast.dismiss(this.connectingToast);
-      toast.success("Connected to server", {
-        hideProgressBar: true,
-      });
+      this.displaySuccessToast();
     }.bind(this);
 
     this.websocket.onclose = function (event) {
@@ -163,6 +166,14 @@ export default class Database {
     }
   }
 
+  private displaySuccessToast() {
+    if (!this.successToast) {
+      this.successToast = toast.success("Connected to server", {
+        hideProgressBar: true,
+      });
+    }
+  }
+
   private retryConnect() {
     if (!this.retryInterval) {
       this.retryInterval = setInterval(this.connect.bind(this), 2000);
@@ -180,7 +191,7 @@ export default class Database {
       payload: {
         name: this.gameId,
         perma: this.permaId,
-        mode: "ITEMSYNC",
+        mode: this.mode,
         initialData: this.initialData,
       },
     };
@@ -195,6 +206,32 @@ export default class Database {
         itemName,
       },
     };
+    this.send(message);
+  }
+
+  public setEntrance(exitName: string, entranceName: string) {
+    const message = {
+      method: "set",
+      payload: {
+        type: SaveDataType.ENTRANCE,
+        entranceName,
+        exitName
+      }
+    }
+
+    this.send(message);
+  }
+
+  public setIslandForChart(island: string, chart: string) {
+    const message = {
+      method: "set",
+      payload: {
+        type: SaveDataType.ISLANDS_FOR_CHARTS,
+        island,
+        chart
+      }
+    }
+
     this.send(message);
   }
 
@@ -215,7 +252,7 @@ export default class Database {
     const message = {
       method: "set",
       payload: {
-        type: "ITEM",
+        type: SaveDataType.ITEM,
         itemName,
         count,
         generalLocation,
@@ -224,13 +261,17 @@ export default class Database {
       },
     };
     this.send(message);
+
+    _.set(this.state, ['items', itemName, this.userId], { count })
+    _.set(this.state, ['itemsForLocation'
+      , Database.getLocationKey(generalLocation, detailedLocation), this.userId], { itemName })
   }
 
   private getLocation(generalLocation: string, detailedLocation: string) {
     const message = {
       method: "get",
       data: {
-        type: "LOCATION",
+        type: SaveDataType.LOCATION,
         generalLocation,
         detailedLocation,
       },
@@ -248,7 +289,7 @@ export default class Database {
     const message = {
       method: "set",
       payload: {
-        type: "LOCATION",
+        type: SaveDataType.LOCATION,
         generalLocation,
         detailedLocation,
         isChecked,
@@ -257,6 +298,8 @@ export default class Database {
     };
 
     this.send(message);
+
+    _.set(this.state, ['locations', Database.getLocationKey(generalLocation, detailedLocation), this.userId], { isChecked })
   }
 
   private send(message: object): string {
@@ -317,14 +360,17 @@ export default class Database {
     //Initial load
     this.state = data;
     this.roomId = data.id;
-    this.databaseInitialLoad();
+    this.databaseInitialLoad(data);
   }
+
+
 
   private onDataSaved(data: OnDataSaved) {
     if (data.type === SaveDataType.LOCATION) {
-      _.set(this.state, ['locations', `${data.generalLocation}#${data.detailedLocation}`, data.userId, 'isChecked'], data.isChecked)
+      _.set(this.state, ['locations', Database.getLocationKey(data.generalLocation, data.detailedLocation), data.userId, 'isChecked'], data.isChecked)
     } else if (data.type === SaveDataType.ITEM) {
       _.set(this.state, ['items', data.itemName, data.userId, 'count'], data.count)
+      _.set(this.state, ['itemsForLocation', Database.getLocationKey(data.generalLocation, data.detailedLocation), data.userId, 'itemName'], data.itemName)
     }
     this.databaseUpdate(data);
   }
@@ -368,6 +414,8 @@ export enum Mode {
 }
 
 export enum SaveDataType {
+  ENTRANCE = 'ENTRANCE',
+  ISLANDS_FOR_CHARTS = 'ISLANDS_FOR_CHARTS',
   ITEM = "ITEM",
   LOCATION = "LOCATION",
 }
