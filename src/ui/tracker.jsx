@@ -5,7 +5,8 @@ import { Oval } from 'react-loader-spinner';
 import { ToastContainer, toast } from 'react-toastify';
 
 // eslint-disable-next-line import/no-unresolved, import/extensions
-import Database, { Mode, SaveDataType } from '../services/database';
+import DatabaseLogic, { Mode, SaveDataType } from '../services/database-logic';
+import DatabaseState from '../services/database-state';
 import LogicHelper from '../services/logic-helper';
 import TrackerController from '../services/tracker-controller';
 
@@ -104,9 +105,9 @@ class Tracker extends React.PureComponent {
       }
     }
 
-    let database;
+    let databaseLogic;
     if (gameId) {
-      database = new Database({
+      databaseLogic = new DatabaseLogic({
         permaId: permalink,
         gameId,
         databaseInitialLoad: this.databaseInitialLoad.bind(this),
@@ -135,7 +136,8 @@ class Tracker extends React.PureComponent {
     } = initialData;
 
     this.setState({
-      database,
+      databaseLogic,
+      databaseState: new DatabaseState(),
       isLoading: false,
       logic,
       saveData,
@@ -143,22 +145,27 @@ class Tracker extends React.PureComponent {
       trackerState,
     });
 
-    if (database) {
-      database.connect();
+    if (databaseLogic) {
+      databaseLogic.connect();
     }
   }
 
-  databaseInitialLoad() {
-    const { database, trackerState } = this.state;
+  databaseInitialLoad(data) {
+    const { databaseLogic, databaseState, trackerState } = this.state;
+
+    const newDatabaseState = databaseState.setState(data);
 
     let newTrackerState = trackerState._clone({
+      entrances: true,
+      islandsForCharts: true,
       items: true,
       locationsChecked: true,
+      itemsForLocations: true,
     });
 
-    const destructId = database.mode === Mode.ITEMSYNC ? database.roomId : database.userId;
+    const destructId = databaseLogic.effectiveUserId;
 
-    _.forEach(database.state.entrances, (entranceData, exitName) => {
+    _.forEach(newDatabaseState.entrances, (entranceData, exitName) => {
       const { entranceName } = entranceData[destructId] ?? {};
 
       if (entranceName) {
@@ -166,7 +173,7 @@ class Tracker extends React.PureComponent {
       }
     });
 
-    _.forEach(database.state.islandsForCharts, (chartData, chart) => {
+    _.forEach(newDatabaseState.islandsForCharts, (chartData, chart) => {
       const { island } = chartData[destructId] ?? {};
 
       if (island) {
@@ -174,7 +181,7 @@ class Tracker extends React.PureComponent {
       }
     });
 
-    _.forEach(database.state.items, (itemData, itemName) => {
+    _.forEach(newDatabaseState.items, (itemData, itemName) => {
       const { count } = itemData[destructId] ?? {};
 
       if (count) {
@@ -182,7 +189,7 @@ class Tracker extends React.PureComponent {
       }
     });
 
-    _.forEach(database.state.locations, (locationData, location) => {
+    _.forEach(newDatabaseState.locations, (locationData, location) => {
       const [generalLocation, detailedLocation] = location.split('#');
       const { isChecked } = locationData[destructId] ?? {};
       if (isChecked) {
@@ -194,7 +201,7 @@ class Tracker extends React.PureComponent {
       }
     });
 
-    _.forEach(database.state.itemsForLocation, (locationData, location) => {
+    _.forEach(newDatabaseState.itemsForLocation, (locationData, location) => {
       const [generalLocation, detailedLocation] = location.split('#');
       const { itemName } = locationData[destructId] ?? {};
 
@@ -207,19 +214,22 @@ class Tracker extends React.PureComponent {
       }
     });
 
-    this.updateTrackerState(newTrackerState);
+    this.updateTrackerState(newTrackerState, newDatabaseState);
   }
 
   databaseUpdate(data) {
-    const { database, trackerState } = this.state;
+    const { databaseLogic, databaseState, trackerState } = this.state;
 
-    const destructId = database.mode === Mode.ITEMSYNC ? database.roomId : database.userId;
+    const destructId = databaseLogic.effectiveUserId;
 
     let newTrackerState = trackerState._clone({
+      entrances: true,
+      islandsForCharts: true,
       items: true,
       itemsForLocations: true,
       locationsChecked: true,
     });
+
     if (data.userId === destructId) {
       if (data.type === SaveDataType.ITEM) {
         const {
@@ -248,7 +258,8 @@ class Tracker extends React.PureComponent {
 
   incrementItem(itemName) {
     const {
-      database,
+      databaseLogic,
+      databaseState,
       lastLocation,
       trackerState,
     } = this.state;
@@ -268,37 +279,42 @@ class Tracker extends React.PureComponent {
       );
     }
 
-    this.updateTrackerState(newTrackerState);
-
-    if (database) {
+    let newDatabaseState = databaseState;
+    if (databaseLogic) {
       const { generalLocation, detailedLocation } = lastLocation ?? {};
 
-      database.setItem(itemName, {
+      newDatabaseState = databaseLogic.setItem(newDatabaseState, {
+        itemName,
         count: newTrackerState.getItemValue(itemName),
         generalLocation,
         detailedLocation,
       });
     }
+
+    this.updateTrackerState(newTrackerState, newDatabaseState);
   }
 
   decrementItem(itemName) {
-    const { database, trackerState } = this.state;
+    const { databaseLogic, databaseState, trackerState } = this.state;
 
     const newTrackerState = trackerState.decrementItem(itemName);
 
-    this.updateTrackerState(newTrackerState);
-
-    if (database) {
-      database.setItem(itemName, {
+    let newDatabaseState = databaseState;
+    if (databaseLogic) {
+      newDatabaseState = databaseLogic.setItem(newDatabaseState, {
+        itemName,
         count: newTrackerState.getItemValue(itemName),
       });
     }
+
+    this.updateTrackerState(newTrackerState, newDatabaseState);
   }
 
   toggleLocationChecked(generalLocation, detailedLocation) {
-    const { database, trackerState } = this.state;
+    const { databaseLogic, databaseState, trackerState } = this.state;
 
     let newTrackerState = trackerState.toggleLocationChecked(generalLocation, detailedLocation);
+    let newDatabaseState = databaseState;
 
     if (newTrackerState.isLocationChecked(generalLocation, detailedLocation)) {
       this.setState({
@@ -308,20 +324,26 @@ class Tracker extends React.PureComponent {
         },
       });
 
-      if (database) {
-        database.setLocation(generalLocation, detailedLocation, true);
+      if (databaseLogic) {
+        newDatabaseState = databaseLogic.setLocation(
+          newDatabaseState,
+          { generalLocation, detailedLocation, isChecked: true },
+        );
       }
     } else {
       this.setState({ lastLocation: null });
 
       newTrackerState = newTrackerState.unsetItemForLocation(generalLocation, detailedLocation);
 
-      if (database) {
-        database.setLocation(generalLocation, detailedLocation, false);
+      if (databaseLogic) {
+        newDatabaseState = databaseLogic.setLocation(
+          newDatabaseState,
+          { generalLocation, detailedLocation, isChecked: false },
+        );
       }
     }
 
-    this.updateTrackerState(newTrackerState);
+    this.updateTrackerState(newTrackerState, newDatabaseState);
   }
 
   clearRaceModeBannedLocations(dungeonName) {
@@ -338,7 +360,7 @@ class Tracker extends React.PureComponent {
     this.updateTrackerState(newTrackerState);
   }
 
-  updateTrackerState(newTrackerState) {
+  updateTrackerState(newTrackerState, newDatabaseState) {
     const {
       logic,
       saveData,
@@ -347,7 +369,9 @@ class Tracker extends React.PureComponent {
     } = TrackerController.refreshState(newTrackerState);
 
     Storage.saveToStorage(saveData);
+
     this.setState({
+      databaseState: newDatabaseState,
       logic,
       saveData,
       spheres,
@@ -395,7 +419,7 @@ class Tracker extends React.PureComponent {
   }
 
   updateEntranceForExit(exitName, entranceName) {
-    const { database, trackerState } = this.state;
+    const { databaseLogic, trackerState } = this.state;
 
     const entryName = LogicHelper.entryName(exitName);
     const newTrackerState = trackerState
@@ -404,9 +428,9 @@ class Tracker extends React.PureComponent {
 
     this.updateTrackerState(newTrackerState);
 
-    if (database) {
-      database.setEntrance(exitName, entranceName);
-      database.setItem(entryName, { count: newTrackerState.getItemValue(entryName) });
+    if (databaseLogic) {
+      databaseLogic.setEntrance(exitName, entranceName);
+      databaseLogic.setItem(entryName, { count: newTrackerState.getItemValue(entryName) });
     }
 
     this.clearOpenedMenus();
@@ -424,7 +448,7 @@ class Tracker extends React.PureComponent {
   }
 
   updateChartMapping(chart, chartForIsland) {
-    const { database, lastLocation, trackerState } = this.state;
+    const { databaseLogic, lastLocation, trackerState } = this.state;
 
     let newTrackerState = trackerState
       .setChartMapping(chart, chartForIsland);
@@ -450,20 +474,20 @@ class Tracker extends React.PureComponent {
       newTrackerState = newTrackerState.incrementItem(chartForIsland);
     }
 
-    if (database) {
+    if (databaseLogic) {
       const island = LogicHelper.islandFromChartForIsland(chartForIsland);
       const {
         generalLocation,
         detailedLocation,
       } = lastLocation ?? {};
 
-      database.setIslandForChart(island, chart);
-      database.setItem(chart, {
+      databaseLogic.setIslandForChart(island, chart);
+      databaseLogic.setItem(chart, {
         count: newTrackerState.getItemValue(chart),
         generalLocation,
         detailedLocation,
       });
-      database.setItem(chartForIsland, {
+      databaseLogic.setItem(chartForIsland, {
         count: newTrackerState.getItemValue(chartForIsland),
         generalLocation,
         detailedLocation,
@@ -593,7 +617,7 @@ class Tracker extends React.PureComponent {
       chartListOpen,
       colorPickerOpen,
       colors,
-      database,
+      databaseState,
       disableLogic,
       entrancesListOpen,
       isLoading,
@@ -632,7 +656,7 @@ class Tracker extends React.PureComponent {
           <div className="tracker">
             <ItemsTable
               backgroundColor={itemsTableBackground}
-              database={database}
+              databaseState={databaseState}
               decrementItem={this.decrementItem}
               incrementItem={this.incrementItem}
               spheres={spheres}
@@ -644,7 +668,7 @@ class Tracker extends React.PureComponent {
               chartListOpen={chartListOpen}
               clearOpenedMenus={this.clearOpenedMenus}
               clearRaceModeBannedLocations={this.clearRaceModeBannedLocations}
-              database={database}
+              databaseState={databaseState}
               decrementItem={this.decrementItem}
               disableLogic={disableLogic}
               entrancesListOpen={entrancesListOpen}

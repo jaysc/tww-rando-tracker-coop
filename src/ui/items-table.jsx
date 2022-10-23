@@ -2,7 +2,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import Database from '../services/database';
+import DatabaseState from '../services/database-state';
 import LogicHelper from '../services/logic-helper';
 import Spheres from '../services/spheres';
 import TrackerState from '../services/tracker-state';
@@ -50,7 +50,7 @@ class ItemsTable extends React.PureComponent {
 
   item(itemName, showLocationTooltip = true) {
     const {
-      database,
+      databaseState,
       decrementItem,
       incrementItem,
       spheres,
@@ -62,9 +62,9 @@ class ItemsTable extends React.PureComponent {
     const itemImages = _.get(Images.IMAGES, ['ITEMS', itemName]);
 
     const databaseMaxCount = _.reduce(
-      _.get(database, ['state', 'items', itemName]),
+      _.get(databaseState, ['items', itemName]),
       (acc, value, userId) => {
-        if (database.userId !== userId) {
+        if (databaseState.userId !== userId) {
           return value.count > acc ? value.count : acc;
         }
         return acc;
@@ -73,11 +73,11 @@ class ItemsTable extends React.PureComponent {
     );
 
     const databaseLocations = _.reduce(
-      _.get(database, ['state', 'itemsForLocation']),
+      _.get(databaseState, ['itemsForLocation']),
       (acc, data, location) => {
         const [generalLocation, detailedLocation] = location.split('#');
         _.forEach(data, (itemData, userId) => {
-          if (database.userId !== userId) {
+          if (databaseState.userId !== userId) {
             const { itemName: databaseItemName } = itemData;
             if (itemName === databaseItemName) {
               acc.push({
@@ -250,7 +250,7 @@ ItemsTable.defaultProps = {
 
 ItemsTable.propTypes = {
   backgroundColor: PropTypes.string,
-  database: PropTypes.instanceOf(Database).isRequired,
+  databaseState: PropTypes.instanceOf(DatabaseState).isRequired,
   decrementItem: PropTypes.func.isRequired,
   incrementItem: PropTypes.func.isRequired,
   spheres: PropTypes.instanceOf(Spheres).isRequired,

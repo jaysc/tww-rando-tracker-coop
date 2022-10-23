@@ -2,7 +2,8 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import Database from '../services/database';
+import DatabaseHelper from '../services/database-helper';
+import DatabaseState from '../services/database-state';
 import LogicCalculation from '../services/logic-calculation';
 import LogicHelper from '../services/logic-helper';
 import Permalink from '../services/permalink';
@@ -110,7 +111,7 @@ class DetailedLocationsTable extends React.PureComponent {
     } = locationInfo;
 
     const {
-      database,
+      databaseState,
       disableLogic,
       openedLocation,
       spheres,
@@ -140,13 +141,13 @@ class DetailedLocationsTable extends React.PureComponent {
     const isLocationChecked = color === LogicCalculation.LOCATION_COLORS.CHECKED_LOCATION;
 
     const isDatabaseChecked = _.some(
-      _.get(database, ['state', 'locations', Database.getLocationKey(openedLocation, location)]),
-      (value, userId) => database.userId !== userId && value.isChecked,
+      _.get(databaseState, ['locations', DatabaseHelper.getLocationKey(openedLocation, location)]),
+      (value, userId) => databaseState.userId !== userId && value.isChecked,
     );
     const databaseItems = _.reduce(
-      _.get(database, ['state', 'itemsForLocation', Database.getLocationKey(openedLocation, location)]),
+      _.get(databaseState, ['itemsForLocation', DatabaseHelper.getLocationKey(openedLocation, location)]),
       (acc, itemData, userId) => {
-        if (database.userId !== userId) {
+        if (databaseState.userId !== userId) {
           const { itemName } = itemData;
           if (!acc.includes(itemName)) {
             acc.push(itemName);
@@ -296,7 +297,7 @@ class DetailedLocationsTable extends React.PureComponent {
 DetailedLocationsTable.propTypes = {
   clearOpenedMenus: PropTypes.func.isRequired,
   clearRaceModeBannedLocations: PropTypes.func.isRequired,
-  database: PropTypes.instanceOf(Database).isRequired,
+  databaseState: PropTypes.instanceOf(DatabaseState).isRequired,
   disableLogic: PropTypes.bool.isRequired,
   logic: PropTypes.instanceOf(LogicCalculation).isRequired,
   onlyProgressLocations: PropTypes.bool.isRequired,

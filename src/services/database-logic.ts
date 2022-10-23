@@ -1,8 +1,10 @@
 import { v4 } from "uuid";
 import _ from "lodash";
 import { Id, toast } from "react-toastify";
+import DatabaseHelper from "./database-helper";
+import DatabaseState from "./database-state";
 
-export interface IDatabase {
+export interface IDatabaseLogic {
   userId?: string;
   permaId: string;
   gameId: string;
@@ -20,7 +22,91 @@ type InitialData = {
   };
 };
 
-export default class Database {
+interface MessageEvent {
+  event?: string;
+  data?: object;
+  message?: string;
+  err?: string;
+}
+
+interface OnConnect {
+  userId: string;
+}
+
+export interface OnJoinedRoom {
+  id: string;
+  entrances: object;
+  islandsForCharts: object;
+  //(itemname -> (User -> useritem))
+  items: Record<string, Record<string, UserItem>>;
+
+  itemsForLocation: object;
+
+  // Key: generalLocation#detailedLocation
+  //(key -> (User -> useritem))
+  locationsChecked: Record<string, Record<string, UserLocation>>;
+}
+
+export type UserItem = {
+  count: number;
+  generalLocation?: string;
+  detailedLocation?: string;
+};
+
+type UserLocation = {
+  generalLocation: string;
+  detailedLocation: string;
+};
+
+export enum Mode {
+  ITEMSYNC = "ITEMSYNC",
+  COOP = "COOP",
+}
+
+export enum SaveDataType {
+  ENTRANCE = 'ENTRANCE',
+  ISLANDS_FOR_CHARTS = 'ISLANDS_FOR_CHARTS',
+  ITEM = "ITEM",
+  LOCATION = "LOCATION",
+}
+
+export type OnDataSaved = {
+  count?: number;
+  itemName?: string;
+  type: SaveDataType;
+  userId: string;
+  generalLocation?: string;
+  detailedLocation?: string;
+  isChecked?: boolean;
+};
+
+export interface EntrancePayload {
+  entranceName: string
+  exitName: string
+}
+
+export interface IslandsForChartPayload {
+  chart: string
+  island: string
+}
+
+export interface ItemPayload {
+  itemName: string
+  count?: number
+  generalLocation?: string
+  detailedLocation?: string
+  sphere?: number
+}
+
+export interface LocationPayload {
+  generalLocation: string
+  detailedLocation: string
+  isChecked?: boolean
+  itemName?: string
+  sphere?: number
+}
+
+export default class DatabaseLogic {
   websocket: WebSocket;
   permaId: string;
   gameId: string;
@@ -37,16 +123,11 @@ export default class Database {
   databaseInitialLoad: (data: OnJoinedRoom) => void;
   databaseUpdate: (data: OnDataSaved) => void;
 
-  state: {
-    items: Record<string, Record<string, UserItem>>;
-    locations: object;
-  };
-
-  private static getLocationKey(generalLocation, detailedLocation) {
-    return `${generalLocation}#${detailedLocation}`;
+  get effectiveUserId () {
+    return this.mode === Mode.ITEMSYNC ? this.roomId : this.userId;
   }
 
-  constructor(options: IDatabase) {
+  constructor(options: IDatabaseLogic) {
     console.log("connecting to server");
     this.gameId = options.gameId;
     this.permaId = options.permaId;
@@ -236,19 +317,17 @@ export default class Database {
   }
 
   public setItem(
-    itemName: string,
-    {
+    databaseState: DatabaseState,
+    itemPayload: ItemPayload
+  ) {
+    const {
+      itemName,
       count,
       generalLocation,
       detailedLocation,
       sphere,
-    }: {
-      count: number;
-      generalLocation?: string;
-      detailedLocation?: string;
-      sphere?: number;
-    }
-  ) {
+    } = itemPayload;
+
     const message = {
       method: "set",
       payload: {
@@ -260,11 +339,10 @@ export default class Database {
         sphere,
       },
     };
+
     this.send(message);
 
-    _.set(this.state, ['items', itemName, this.userId], { count })
-    _.set(this.state, ['itemsForLocation'
-      , Database.getLocationKey(generalLocation, detailedLocation), this.userId], { itemName })
+    return databaseState.setItem(this.effectiveUserId, itemPayload)
   }
 
   private getLocation(generalLocation: string, detailedLocation: string) {
@@ -280,12 +358,13 @@ export default class Database {
     this.send(message);
   }
 
-  public setLocation(
-    generalLocation: string,
-    detailedLocation: string,
-    isChecked: boolean,
-    itemName?: string
-  ) {
+  public setLocation(databaseState: DatabaseState, locationPayload: LocationPayload) {
+    const {
+      generalLocation,
+      detailedLocation,
+      isChecked
+    } = locationPayload;
+
     const message = {
       method: "set",
       payload: {
@@ -293,13 +372,11 @@ export default class Database {
         generalLocation,
         detailedLocation,
         isChecked,
-        itemName,
       },
     };
 
     this.send(message);
-
-    _.set(this.state, ['locations', Database.getLocationKey(generalLocation, detailedLocation), this.userId], { isChecked })
+    return databaseState.setLocation(this.effectiveUserId, locationPayload)
   }
 
   private send(message: object): string {
@@ -358,7 +435,6 @@ export default class Database {
   }
   private onJoinedRoom(data: OnJoinedRoom) {
     //Initial load
-    this.state = data;
     this.roomId = data.id;
     this.databaseInitialLoad(data);
   }
@@ -366,66 +442,12 @@ export default class Database {
 
 
   private onDataSaved(data: OnDataSaved) {
-    if (data.type === SaveDataType.LOCATION) {
-      _.set(this.state, ['locations', Database.getLocationKey(data.generalLocation, data.detailedLocation), data.userId, 'isChecked'], data.isChecked)
-    } else if (data.type === SaveDataType.ITEM) {
-      _.set(this.state, ['items', data.itemName, data.userId, 'count'], data.count)
-      _.set(this.state, ['itemsForLocation', Database.getLocationKey(data.generalLocation, data.detailedLocation), data.userId, 'itemName'], data.itemName)
-    }
+    // if (data.type === SaveDataType.LOCATION) {
+    //   _.set(this.state, ['locations', DatabaseHelper.getLocationKey(data.generalLocation, data.detailedLocation), data.userId, 'isChecked'], data.isChecked)
+    // } else if (data.type === SaveDataType.ITEM) {
+    //   _.set(this.state, ['items', data.itemName, data.userId, 'count'], data.count)
+    //   _.set(this.state, ['itemsForLocation', DatabaseHelper.getLocationKey(data.generalLocation, data.detailedLocation), data.userId, 'itemName'], data.itemName)
+    // }
     this.databaseUpdate(data);
   }
 }
-
-interface MessageEvent {
-  event?: string;
-  data?: object;
-  message?: string;
-  err?: string;
-}
-
-interface OnConnect {
-  userId: string;
-}
-
-export interface OnJoinedRoom {
-  id: string;
-  //(itemname -> (User -> useritem))
-  items: Record<string, Record<string, UserItem>>;
-
-  // Key: generalLocation#detailedLocation
-  //(key -> (User -> useritem))
-  locations: Record<string, Record<string, UserLocation>>;
-}
-
-type UserItem = {
-  count: number;
-  generalLocation?: string;
-  detailedLocation?: string;
-};
-
-type UserLocation = {
-  generalLocation: string;
-  detailedLocation: string;
-};
-
-export enum Mode {
-  ITEMSYNC = "ITEMSYNC",
-  COOP = "COOP",
-}
-
-export enum SaveDataType {
-  ENTRANCE = 'ENTRANCE',
-  ISLANDS_FOR_CHARTS = 'ISLANDS_FOR_CHARTS',
-  ITEM = "ITEM",
-  LOCATION = "LOCATION",
-}
-
-export type OnDataSaved = {
-  count?: number;
-  itemName?: string;
-  type: SaveDataType;
-  userId: string;
-  generalLocation?: string;
-  detailedLocation?: string;
-  isChecked?: boolean;
-};
