@@ -38,7 +38,7 @@
     "@babel/preset-env": "^7.19.4",
     "@babel/preset-react": "^7.18.6",
     "@types/lodash": "^4.14.184",
-    "@types/react": "^18.0.19",
+    "@types/react": "^18.0.23",
     "@types/uuid": "^8.3.4",
     "babel-loader": "^8.2.5",
     "css-loader": "^6.7.1",
