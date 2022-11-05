@@ -4,10 +4,8 @@ import React from 'react';
 import { Oval } from 'react-loader-spinner';
 import { ToastContainer, toast } from 'react-toastify';
 
-// eslint-disable-next-line import/no-unresolved, import/extensions
-import DatabaseLogic, { SaveDataType } from '../services/database-logic';
-// eslint-disable-next-line import/no-unresolved, import/extensions
-import DatabaseState from '../services/database-state';
+import DatabaseLogic, { SaveDataType } from '../services/database-logic.ts';
+import DatabaseState from '../services/database-state.ts';
 import LogicHelper from '../services/logic-helper';
 import TrackerController from '../services/tracker-controller';
 
