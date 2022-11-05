@@ -2,6 +2,8 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import DatabaseLogic from '../services/database-logic.ts';
+import DatabaseState from '../services/database-state.ts';
 import LogicCalculation from '../services/logic-calculation';
 import Spheres from '../services/spheres';
 import TrackerState from '../services/tracker-state';
@@ -76,6 +78,8 @@ class LocationsTable extends React.PureComponent {
       chartListOpen,
       clearOpenedMenus,
       clearRaceModeBannedLocations,
+      databaseLogic,
+      databaseState,
       decrementItem,
       disableLogic,
       entrancesListOpen,
@@ -112,6 +116,8 @@ class LocationsTable extends React.PureComponent {
       chartElement = (
         <ChartList
           clearOpenedMenus={clearOpenedMenus}
+          databaseLogic={databaseLogic}
+          databaseState={databaseState}
           incrementItem={incrementItem}
           openedChartForIsland={openedChartForIsland}
           spheres={spheres}
@@ -146,6 +152,8 @@ class LocationsTable extends React.PureComponent {
         <DetailedLocationsTable
           clearOpenedMenus={clearOpenedMenus}
           clearRaceModeBannedLocations={clearRaceModeBannedLocations}
+          databaseLogic={databaseLogic}
+          databaseState={databaseState}
           disableLogic={disableLogic}
           logic={logic}
           onlyProgressLocations={onlyProgressLocations}
@@ -163,6 +171,8 @@ class LocationsTable extends React.PureComponent {
           clearSelectedChartForIsland={this.clearSelectedChartForIsland}
           clearSelectedItem={this.clearSelectedItem}
           clearSelectedLocation={this.clearSelectedLocation}
+          databaseLogic={databaseLogic}
+          databaseState={databaseState}
           decrementItem={decrementItem}
           disableLogic={disableLogic}
           incrementItem={incrementItem}
@@ -205,6 +215,8 @@ class LocationsTable extends React.PureComponent {
   render() {
     const {
       backgroundColor,
+      databaseLogic,
+      databaseState,
       decrementItem,
       disableLogic,
       incrementItem,
@@ -225,6 +237,8 @@ class LocationsTable extends React.PureComponent {
           backgroundColor={backgroundColor}
           clearSelectedItem={this.clearSelectedItem}
           clearSelectedLocation={this.clearSelectedLocation}
+          databaseLogic={databaseLogic}
+          databaseState={databaseState}
           decrementItem={decrementItem}
           disableLogic={disableLogic}
           incrementItem={incrementItem}
@@ -258,6 +272,8 @@ LocationsTable.propTypes = {
   chartListOpen: PropTypes.bool.isRequired,
   clearOpenedMenus: PropTypes.func.isRequired,
   clearRaceModeBannedLocations: PropTypes.func.isRequired,
+  databaseLogic: PropTypes.instanceOf(DatabaseLogic).isRequired,
+  databaseState: PropTypes.instanceOf(DatabaseState).isRequired,
   decrementItem: PropTypes.func.isRequired,
   disableLogic: PropTypes.bool.isRequired,
   entrancesListOpen: PropTypes.bool.isRequired,

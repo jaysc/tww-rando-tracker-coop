@@ -44,6 +44,7 @@ class LogicCalculation {
     CHECKED_LOCATION: 'checked-location',
     NON_PROGRESS_LOCATION: 'non-progress-location',
     UNAVAILABLE_LOCATION: 'unavailable-location',
+    COOP_CHECKED_LOCATION: 'coop-checked-location',
   };
 
   formattedRequirementsForLocation(generalLocation, detailedLocation) {

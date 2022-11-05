@@ -2,6 +2,9 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import DatabaseHelper from '../services/database-helper.ts';
+import DatabaseLogic from '../services/database-logic.ts';
+import DatabaseState from '../services/database-state.ts';
 import LogicCalculation from '../services/logic-calculation';
 import LogicHelper from '../services/logic-helper';
 import Spheres from '../services/spheres';
@@ -90,6 +93,8 @@ class ChartList extends React.PureComponent {
     }
 
     const {
+      databaseLogic,
+      databaseState,
       incrementItem,
       spheres,
       trackerState,
@@ -105,9 +110,21 @@ class ChartList extends React.PureComponent {
     );
     const isChartMapped = !_.isNil(mappedIslandForChart);
 
-    const color = itemCount === 1
-      ? LogicCalculation.LOCATION_COLORS.CHECKED_LOCATION
-      : LogicCalculation.LOCATION_COLORS.AVAILABLE_LOCATION;
+    const databaseMaxCount = DatabaseHelper.getMaxCount(databaseLogic, databaseState, chartName);
+    const databaseLocations = DatabaseHelper.getDatabaseLocations(
+      databaseLogic,
+      databaseState,
+      chartName,
+    );
+
+    let color;
+    if (itemCount === 1) {
+      color = LogicCalculation.LOCATION_COLORS.CHECKED_LOCATION;
+    } else if (databaseMaxCount !== itemCount || databaseLocations.length > 0) {
+      color = LogicCalculation.LOCATION_COLORS.COOP_CHECKED_LOCATION;
+    } else {
+      color = LogicCalculation.LOCATION_COLORS.AVAILABLE_LOCATION;
+    }
 
     let locations = [];
     if (showLocationTooltip && trackSpheres) {
@@ -149,8 +166,39 @@ class ChartList extends React.PureComponent {
       </div>
     ) : null;
 
+    const existingLocation = [];
+    let databaseContent;
+    if (!_.isEmpty(databaseLocations)) {
+      const databaseList = _.reduce(databaseLocations, (acc, {
+        generalLocation, detailedLocation,
+      }) => {
+        const sphere = spheres.sphereForLocation(generalLocation, detailedLocation);
+        const sphereText = _.isNil(sphere) ? '?' : sphere;
+        const locationName = `${generalLocation} | ${detailedLocation}`;
+
+        if (!existingLocation.includes(locationName)) {
+          acc.push((
+            <li key={locationName}>
+              {`[${sphereText}] ${locationName}`}
+            </li>
+          ));
+        }
+
+        return acc;
+      }, []);
+
+      if (databaseList.length > 0) {
+        databaseContent = (
+          <div className="tooltip item-location">
+            <div className="tooltip-title">Coop Found At</div>
+            <ul>{databaseList}</ul>
+          </div>
+        );
+      }
+    }
+
     let outerChartElement;
-    if (foundAtTooltipContent || chartLeadsTo) {
+    if (foundAtTooltipContent || chartLeadsTo || databaseContent) {
       const tooltipContent = (
         <>
           {foundAtTooltipContent}
@@ -158,6 +206,7 @@ class ChartList extends React.PureComponent {
             <div className="tooltip-spacer" />
           )}
           {chartLeadsTo}
+          {databaseContent}
         </>
       );
       outerChartElement = (
@@ -215,6 +264,8 @@ ChartList.defaultProps = {
 
 ChartList.propTypes = {
   clearOpenedMenus: PropTypes.func.isRequired,
+  databaseLogic: PropTypes.instanceOf(DatabaseLogic).isRequired,
+  databaseState: PropTypes.instanceOf(DatabaseState).isRequired,
   incrementItem: PropTypes.func.isRequired,
   openedChartForIsland: PropTypes.string,
   spheres: PropTypes.instanceOf(Spheres).isRequired,

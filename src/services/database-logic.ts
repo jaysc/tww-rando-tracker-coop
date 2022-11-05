@@ -1,14 +1,16 @@
 import { v4 } from "uuid";
 import _ from "lodash";
-import { toast } from "react-toastify";
+import { Id, toast } from "react-toastify";
+import DatabaseState, { Entrances, IslandsForCharts, Items, ItemsForLocations, LocationsChecked } from "./database-state";
 
-export interface IDatabase {
+export interface IDatabaseLogic {
   userId?: string;
   permaId: string;
   gameId: string;
-  mode?: Mode;
+  mode?: string;
   initialData?: InitialData;
-  databaseInitialLoad: () => void;
+  onConnectedStatusChanged: (status: boolean) => void;
+  databaseInitialLoad: (data: OnJoinedRoom) => void;
   databaseUpdate: (data: OnDataSaved) => void;
 }
 
@@ -20,34 +22,121 @@ type InitialData = {
   };
 };
 
-export default class Database {
-  websocket: WebSocket;
-  permaId: string;
-  gameId: string;
+interface MessageEvent {
+  data?: object
+  error?: string
+  event: string
+  message?: string
+  messageId?: string
+}
+
+interface OnConnect {
   userId: string;
-  mode: Mode;
-  roomId: string;
+}
+
+export interface OnJoinedRoom {
+  id: string;
+  entrances: Entrances;
+  islandsForCharts: IslandsForCharts;
+  //(itemname -> (User -> useritem))
+  items: Items;
+
+  itemsForLocation: ItemsForLocations;
+
+  // Key: generalLocation#detailedLocation
+  //(key -> (User -> useritem))
+  locationsChecked: LocationsChecked;
+}
+
+export enum Mode {
+  ITEMSYNC = "ITEMSYNC",
+  COOP = "COOP",
+}
+
+export enum SaveDataType {
+  ENTRANCE = 'ENTRANCE',
+  ISLANDS_FOR_CHARTS = 'ISLANDS_FOR_CHARTS',
+  ITEM = "ITEM",
+  LOCATION = "LOCATION",
+}
+
+export type OnDataSaved = {
+  count?: number;
+  itemName?: string;
+  type: SaveDataType;
+  userId: string;
+  generalLocation?: string;
+  detailedLocation?: string;
+  isChecked?: boolean;
+};
+
+export interface EntrancePayload {
+  entranceName: string
+  exitName: string
+  useRoomId?: boolean
+}
+
+export interface IslandsForChartPayload {
+  chart: string
+  island: string
+  useRoomId?: boolean
+}
+
+export interface ItemPayload {
+  itemName: string
+  count?: number
+  generalLocation?: string
+  detailedLocation?: string
+  sphere?: number
+  useRoomId?: boolean
+}
+
+export interface LocationPayload {
+  generalLocation: string
+  detailedLocation: string
+  isChecked?: boolean
+  itemName?: string
+  sphere?: number
+  useRoomId?: boolean
+}
+
+export default class DatabaseLogic {
+  connected: boolean;
+  connectingToast: Id;
+  disconnectedToast: Id;
+  gameId: string;
   initialData: InitialData;
-  connectingToast;
-  disconnectedToast;
+  mode: Mode;
+  permaId: string;
+  roomId: string;
+  successToast: Id;
+  userId: string;
+  websocket: WebSocket;
 
   retryInterval?: NodeJS.Timeout;
 
-  databaseInitialLoad: () => void;
+  databaseInitialLoad: (data: OnJoinedRoom) => void;
   databaseUpdate: (data: OnDataSaved) => void;
+  onConnectedStatusChanged:(status: boolean) => void;
 
-  state: {
-    items: Record<string, Record<string, UserItem>>;
-    locations: object;
-  };
+  get effectiveUserId() {
+    return this.mode === Mode.ITEMSYNC ? this.roomId : this.userId;
+  }
 
-  constructor(options: IDatabase) {
+  get globalUseRoom() {
+    return this.mode === Mode.ITEMSYNC;
+  }
+
+  constructor(options: IDatabaseLogic) {
     console.log("connecting to server");
     this.gameId = options.gameId;
     this.permaId = options.permaId;
+    this.onConnectedStatusChanged = options.onConnectedStatusChanged;
     this.databaseInitialLoad = options.databaseInitialLoad;
     this.databaseUpdate = options.databaseUpdate;
-    this.mode = options.mode ?? Mode.ITEMSYNC;
+    this.mode = options.mode.toUpperCase() as Mode ?? Mode.COOP;
+
+    //This all needs to be reviewed. isn't used
     if (options.initialData) {
       const initialData: InitialData = {
         trackerState: {
@@ -126,7 +215,11 @@ export default class Database {
         autoClose: false,
         closeButton: false,
         hideProgressBar: true,
+        onClose: () => {
+          this.connectingToast = null
+        }
       });
+      this.updateConnectedStatus(false)
     }
     this.websocket = new WebSocket(process.env.WEBSOCKET_SERVER, "protocolOne");
 
@@ -135,30 +228,55 @@ export default class Database {
     this.websocket.onopen = function (event) {
       this.clearConnectRetry();
       toast.dismiss(this.disconnectedToast);
+      this.disconnectedToast = null;
       toast.dismiss(this.connectingToast);
-      toast.success("Connected to server", {
-        hideProgressBar: true,
-      });
+      this.connectingToast = null;
+      this.displaySuccessToast();
+      this.updateConnectedStatus(true)
     }.bind(this);
 
     this.websocket.onclose = function (event) {
       console.warn(event);
       this.displayDisconnectToast();
       this.retryConnect();
+      this.updateConnectedStatus(false)
     }.bind(this);
 
     this.websocket.onerror = function (event) {
       console.error(event);
       this.displayDisconnectToast();
       this.retryConnect();
+      this.updateConnectedStatus(false)
     }.bind(this);
   }
 
+  public updateConnectedStatus(newStatus: boolean) {
+    this.connected = newStatus;
+    this.onConnectedStatusChanged(this.connected);
+  }
+
   private displayDisconnectToast() {
+    if (this.successToast) {
+      toast.dismiss(this.successToast);
+    }
     if (!this.disconnectedToast) {
       this.disconnectedToast = toast.error("Disconnected from server", {
         closeButton: false,
         hideProgressBar: true,
+        onClose: () => {
+          this.disconnectedToast = null
+        }
+      });
+    }
+  }
+
+  private displaySuccessToast() {
+    if (!this.successToast) {
+      this.successToast = toast.success("Connected to server", {
+        hideProgressBar: true,
+        onClose: () => {
+          this.successToast = null
+        }
       });
     }
   }
@@ -180,7 +298,7 @@ export default class Database {
       payload: {
         name: this.gameId,
         perma: this.permaId,
-        mode: "ITEMSYNC",
+        mode: this.mode,
         initialData: this.initialData,
       },
     };
@@ -198,39 +316,87 @@ export default class Database {
     this.send(message);
   }
 
+  public setEntrance(databaseState: DatabaseState,
+    entrancePayload: EntrancePayload) {
+    const { entranceName, exitName, useRoomId } = entrancePayload;
+
+    const message = {
+      method: "set",
+      payload: {
+        type: SaveDataType.ENTRANCE,
+        entranceName,
+        exitName,
+        useRoomId: useRoomId || this.globalUseRoom
+      }
+    }
+
+    this.send(message);
+
+    return databaseState.setEntrance(useRoomId ? this.roomId :this.effectiveUserId, entrancePayload)
+  }
+
+  public setIslandsForCharts(
+    databaseState: DatabaseState
+    , islandsForChartsPayload: IslandsForChartPayload
+  ) {
+    const { island, chart, useRoomId } = islandsForChartsPayload;
+    const message = {
+      method: "set",
+      payload: {
+        type: SaveDataType.ISLANDS_FOR_CHARTS,
+        island,
+        chart,
+        useRoomId: useRoomId || this.globalUseRoom
+      }
+    }
+
+    this.send(message);
+
+    return databaseState.setIslandsForCharts(useRoomId ? this.roomId :this.effectiveUserId, islandsForChartsPayload)
+  }
+
   public setItem(
-    itemName: string,
-    {
+    databaseState: DatabaseState,
+    itemPayload: ItemPayload
+  ) {
+    const {
+      itemName,
       count,
       generalLocation,
       detailedLocation,
       sphere,
-    }: {
-      count: number;
-      generalLocation?: string;
-      detailedLocation?: string;
-      sphere?: number;
-    }
-  ) {
+      useRoomId
+    } = itemPayload;
+
     const message = {
       method: "set",
       payload: {
-        type: "ITEM",
+        type: SaveDataType.ITEM,
         itemName,
         count,
         generalLocation,
         detailedLocation,
         sphere,
+        useRoomId: useRoomId || this.globalUseRoom,
       },
     };
+
     this.send(message);
+
+    let newDatabaseState = databaseState.setItem(useRoomId ? this.roomId : this.effectiveUserId, itemPayload)
+
+    if (generalLocation && detailedLocation) {
+      newDatabaseState = newDatabaseState.setItemsForLocations(useRoomId ? this.roomId :this.effectiveUserId, itemPayload);
+    }
+
+    return newDatabaseState;
   }
 
   private getLocation(generalLocation: string, detailedLocation: string) {
     const message = {
       method: "get",
       data: {
-        type: "LOCATION",
+        type: SaveDataType.LOCATION,
         generalLocation,
         detailedLocation,
       },
@@ -239,24 +405,30 @@ export default class Database {
     this.send(message);
   }
 
-  public setLocation(
-    generalLocation: string,
-    detailedLocation: string,
-    isChecked: boolean,
-    itemName?: string
-  ) {
+  public setLocation(databaseState: DatabaseState, locationPayload: LocationPayload) {
+    const {
+      generalLocation,
+      detailedLocation,
+      isChecked,
+      useRoomId
+    } = locationPayload;
+
     const message = {
       method: "set",
       payload: {
-        type: "LOCATION",
+        type: SaveDataType.LOCATION,
         generalLocation,
         detailedLocation,
         isChecked,
-        itemName,
+        useRoomId: useRoomId || this.globalUseRoom,
       },
     };
 
     this.send(message);
+
+    let newDatabaseState = databaseState.setLocation(useRoomId ? this.roomId : this.effectiveUserId, locationPayload);
+
+    return newDatabaseState;
   }
 
   private send(message: object): string {
@@ -274,7 +446,7 @@ export default class Database {
       return;
     }
 
-    let responseData;
+    let responseData: MessageEvent;
     try {
       responseData = JSON.parse(response.data) as MessageEvent;
     } catch (e) {
@@ -284,8 +456,16 @@ export default class Database {
 
     console.log("Recieved message:", responseData);
 
-    if (responseData.err) {
-      console.warn(responseData.err);
+    if (responseData.error) {
+      console.warn(responseData.error);
+
+      toast.error(`Error: ${responseData.error}`, {
+        closeButton: false,
+        autoClose: false,
+        hideProgressBar: true,
+      });
+
+      return;
     }
 
     if (responseData.message) {
@@ -315,69 +495,23 @@ export default class Database {
   }
   private onJoinedRoom(data: OnJoinedRoom) {
     //Initial load
-    this.state = data;
     this.roomId = data.id;
-    this.databaseInitialLoad();
+    this.databaseInitialLoad(data);
   }
 
   private onDataSaved(data: OnDataSaved) {
-    if (data.type === SaveDataType.LOCATION) {
-      _.set(this.state, ['locations', `${data.generalLocation}#${data.detailedLocation}`, data.userId, 'isChecked'], data.isChecked)
-    } else if (data.type === SaveDataType.ITEM) {
-      _.set(this.state, ['items', data.itemName, data.userId, 'count'], data.count)
-    }
     this.databaseUpdate(data);
   }
+
+  public getValue(data: IslandsForCharts | LocationsChecked | Items | ItemsForLocations | Entrances) {
+    let result;
+
+    result = _.get(data, this.effectiveUserId)
+
+    if (_.isNil(result)) {
+      result = _.get(data, this.roomId)
+    }
+
+    return result ?? {};
+  }
 }
-
-interface MessageEvent {
-  event?: string;
-  data?: object;
-  message?: string;
-  err?: string;
-}
-
-interface OnConnect {
-  userId: string;
-}
-
-export interface OnJoinedRoom {
-  id: string;
-  //(itemname -> (User -> useritem))
-  items: Record<string, Record<string, UserItem>>;
-
-  // Key: generalLocation#detailedLocation
-  //(key -> (User -> useritem))
-  locations: Record<string, Record<string, UserLocation>>;
-}
-
-type UserItem = {
-  count: number;
-  generalLocation?: string;
-  detailedLocation?: string;
-};
-
-type UserLocation = {
-  generalLocation: string;
-  detailedLocation: string;
-};
-
-export enum Mode {
-  ITEMSYNC = "ITEMSYNC",
-  COOP = "COOP",
-}
-
-export enum SaveDataType {
-  ITEM = "ITEM",
-  LOCATION = "LOCATION",
-}
-
-export type OnDataSaved = {
-  count?: number;
-  itemName?: string;
-  type: SaveDataType;
-  userId: string;
-  generalLocation?: string;
-  detailedLocation?: string;
-  isChecked?: boolean;
-};

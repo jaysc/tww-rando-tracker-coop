@@ -2,6 +2,9 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import DatabaseHelper from '../services/database-helper.ts';
+import DatabaseLogic from '../services/database-logic.ts';
+import DatabaseState from '../services/database-state.ts';
 import LogicCalculation from '../services/logic-calculation';
 import LogicHelper from '../services/logic-helper';
 import Spheres from '../services/spheres';
@@ -43,6 +46,8 @@ class Sector extends React.PureComponent {
   chartItem() {
     const {
       clearSelectedItem,
+      databaseLogic,
+      databaseState,
       decrementItem,
       incrementItem,
       island,
@@ -59,6 +64,12 @@ class Sector extends React.PureComponent {
 
     const chartCount = trackerState.getItemValue(chartName);
 
+    const databaseMaxCount = DatabaseHelper.getMaxCount(
+      databaseLogic,
+      databaseState,
+      chartName,
+    );
+
     const chartImages = _.get(Images.IMAGES, ['CHARTS', chartType]);
 
     let locations = [];
@@ -67,7 +78,7 @@ class Sector extends React.PureComponent {
     }
 
     return (
-      <div className="treasure-chart">
+      <div className={`treasure-chart ${databaseMaxCount > chartCount ? 'coop-checked-item-chart' : ''}`}>
         <Item
           clearSelectedItem={clearSelectedItem}
           decrementItem={decrementItem}
@@ -87,6 +98,8 @@ class Sector extends React.PureComponent {
     const {
       clearSelectedChartForIsland,
       clearSelectedLocation,
+      databaseLogic,
+      databaseState,
       island,
       setSelectedChartForIsland,
       spheres,
@@ -101,6 +114,12 @@ class Sector extends React.PureComponent {
     const chartCount = trackerState.getItemValue(chartForIsland);
 
     const chartImages = _.get(Images.IMAGES, ['CHARTS', 'Treasure']);
+
+    const databaseMaxCount = DatabaseHelper.getMaxCount(
+      databaseLogic,
+      databaseState,
+      chartForIsland,
+    );
 
     let locations = [];
     if (trackSpheres) {
@@ -119,7 +138,7 @@ class Sector extends React.PureComponent {
     };
 
     return (
-      <div className="treasure-chart">
+      <div className={`treasure-chart ${databaseMaxCount > chartCount ? 'coop-checked-item-chart' : ''}`}>
         <Item
           clearSelectedItem={clearSelectedChartForIsland}
           images={chartImages}
@@ -252,6 +271,8 @@ Sector.propTypes = {
   clearSelectedChartForIsland: PropTypes.func.isRequired,
   clearSelectedItem: PropTypes.func.isRequired,
   clearSelectedLocation: PropTypes.func.isRequired,
+  databaseLogic: PropTypes.instanceOf(DatabaseLogic).isRequired,
+  databaseState: PropTypes.instanceOf(DatabaseState).isRequired,
   decrementItem: PropTypes.func.isRequired,
   disableLogic: PropTypes.bool.isRequired,
   incrementItem: PropTypes.func.isRequired,
