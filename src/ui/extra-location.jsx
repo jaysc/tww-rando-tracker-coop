@@ -2,6 +2,9 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import DatabaseHelper from '../services/database-helper';
+import DatabaseLogic from '../services/database-logic';
+import DatabaseState from '../services/database-state';
 import LogicCalculation from '../services/logic-calculation';
 import LogicHelper from '../services/logic-helper';
 import Spheres from '../services/spheres';
@@ -93,6 +96,8 @@ class ExtraLocation extends React.PureComponent {
   smallKeyItem() {
     const {
       clearSelectedItem,
+      databaseLogic,
+      databaseState,
       decrementItem,
       incrementItem,
       locationName,
@@ -107,15 +112,23 @@ class ExtraLocation extends React.PureComponent {
 
     const smallKeyImages = _.get(Images.IMAGES, 'SMALL_KEYS');
 
+    const databaseMaxCount = DatabaseHelper.getMaxCount(databaseLogic, databaseState, smallKeyName);
+    const databaseLocations = DatabaseHelper.getDatabaseLocations(
+      databaseLogic,
+      databaseState,
+      smallKeyName,
+    );
+
     let locations = [];
     if (trackSpheres) {
       locations = trackerState.getLocationsForItem(smallKeyName);
     }
 
     return (
-      <div className="dungeon-item small-key">
+      <div className={`dungeon-item small-key ${databaseMaxCount > smallKeyCount ? 'coop-checked-dungeon' : ''}`}>
         <Item
           clearSelectedItem={clearSelectedItem}
+          databaseLocations={databaseLocations}
           decrementItem={decrementItem}
           images={smallKeyImages}
           incrementItem={incrementItem}
@@ -132,6 +145,8 @@ class ExtraLocation extends React.PureComponent {
   bigKeyItem() {
     const {
       clearSelectedItem,
+      databaseLogic,
+      databaseState,
       decrementItem,
       incrementItem,
       locationName,
@@ -144,6 +159,13 @@ class ExtraLocation extends React.PureComponent {
     const bigKeyName = LogicHelper.bigKeyName(locationName);
     const bigKeyCount = trackerState.getItemValue(bigKeyName);
 
+    const databaseMaxCount = DatabaseHelper.getMaxCount(databaseLogic, databaseState, bigKeyName);
+    const databaseLocations = DatabaseHelper.getDatabaseLocations(
+      databaseLogic,
+      databaseState,
+      bigKeyName,
+    );
+
     const bigKeyImages = _.get(Images.IMAGES, 'BIG_KEYS');
 
     let locations = [];
@@ -152,9 +174,10 @@ class ExtraLocation extends React.PureComponent {
     }
 
     return (
-      <div className="dungeon-item big-key">
+      <div className={`dungeon-item big-key ${databaseMaxCount > bigKeyCount ? 'coop-checked-dungeon' : ''}`}>
         <Item
           clearSelectedItem={clearSelectedItem}
+          databaseLocations={databaseLocations}
           decrementItem={decrementItem}
           images={bigKeyImages}
           incrementItem={incrementItem}
@@ -326,6 +349,8 @@ class ExtraLocation extends React.PureComponent {
 ExtraLocation.propTypes = {
   clearSelectedItem: PropTypes.func.isRequired,
   clearSelectedLocation: PropTypes.func.isRequired,
+  databaseLogic: PropTypes.instanceOf(DatabaseLogic).isRequired,
+  databaseState: PropTypes.instanceOf(DatabaseState).isRequired,
   decrementItem: PropTypes.func.isRequired,
   disableLogic: PropTypes.bool.isRequired,
   incrementItem: PropTypes.func.isRequired,

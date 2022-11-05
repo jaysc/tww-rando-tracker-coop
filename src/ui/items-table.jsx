@@ -2,6 +2,8 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import DatabaseHelper from '../services/database-helper';
+import DatabaseLogic from '../services/database-logic';
 import DatabaseState from '../services/database-state';
 import LogicHelper from '../services/logic-helper';
 import Spheres from '../services/spheres';
@@ -50,6 +52,7 @@ class ItemsTable extends React.PureComponent {
 
   item(itemName, showLocationTooltip = true) {
     const {
+      databaseLogic,
       databaseState,
       decrementItem,
       incrementItem,
@@ -61,45 +64,12 @@ class ItemsTable extends React.PureComponent {
     const itemCount = trackerState.getItemValue(itemName);
     const itemImages = _.get(Images.IMAGES, ['ITEMS', itemName]);
 
-    const databaseMaxCount = _.reduce(
-      _.get(databaseState, ['items', itemName]),
-      (acc, value, userId) => {
-        if (databaseState.userId !== userId) {
-          return value.count > acc ? value.count : acc;
-        }
-        return acc;
-      },
-      0,
+    const databaseMaxCount = DatabaseHelper.getMaxCount(databaseLogic, databaseState, itemName);
+    const databaseLocations = DatabaseHelper.getDatabaseLocations(
+      databaseLogic,
+      databaseState,
+      itemName,
     );
-
-    const databaseLocations = _.reduce(
-      _.get(databaseState, ['itemsForLocation']),
-      (acc, data, location) => {
-        const [generalLocation, detailedLocation] = location.split('#');
-        _.forEach(data, (itemData, userId) => {
-          if (databaseState.userId !== userId) {
-            const { itemName: databaseItemName } = itemData;
-            if (itemName === databaseItemName) {
-              acc.push({
-                generalLocation,
-                detailedLocation,
-              });
-            }
-          }
-        });
-
-        return acc;
-      },
-      [],
-    );
-
-    let databaseData;
-    if (databaseLocations.length > 0) {
-      databaseData = {
-        maxCount: databaseMaxCount,
-        locations: databaseLocations,
-      };
-    }
 
     let locations = [];
     if (showLocationTooltip && trackSpheres) {
@@ -107,19 +77,20 @@ class ItemsTable extends React.PureComponent {
     }
 
     return (
-      <Item
-        className="test"
-        clearSelectedItem={this.clearSelectedItem}
-        databaseData={databaseData}
-        decrementItem={decrementItem}
-        images={itemImages}
-        incrementItem={incrementItem}
-        itemCount={itemCount}
-        itemName={itemName}
-        locations={locations}
-        setSelectedItem={this.setSelectedItem}
-        spheres={spheres}
-      />
+      <div className={`${databaseMaxCount > itemCount ? 'coop-checked-item' : ''}`}>
+        <Item
+          clearSelectedItem={this.clearSelectedItem}
+          databaseLocations={databaseLocations}
+          decrementItem={decrementItem}
+          images={itemImages}
+          incrementItem={incrementItem}
+          itemCount={itemCount}
+          itemName={itemName}
+          locations={locations}
+          setSelectedItem={this.setSelectedItem}
+          spheres={spheres}
+        />
+      </div>
     );
   }
 
@@ -250,6 +221,7 @@ ItemsTable.defaultProps = {
 
 ItemsTable.propTypes = {
   backgroundColor: PropTypes.string,
+  databaseLogic: PropTypes.instanceOf(DatabaseLogic).isRequired,
   databaseState: PropTypes.instanceOf(DatabaseState).isRequired,
   decrementItem: PropTypes.func.isRequired,
   incrementItem: PropTypes.func.isRequired,

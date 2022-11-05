@@ -1,11 +1,30 @@
 import _ from "lodash";
 import DatabaseHelper from "./database-helper";
-import { ItemPayload, LocationPayload, OnJoinedRoom, UserItem } from "./database-logic";
+import DatabaseLogic, { EntrancePayload, IslandsForChartPayload, ItemPayload, LocationPayload, OnJoinedRoom } from "./database-logic";
 
-export interface IDatabaseState {
-  items: Record<string, Record<string, UserItem>>;
-  locations: object;
-};
+export type IslandsForCharts = Record<string, Record<string, IslandsForChartsValue>>;
+export type IslandsForChartsValue = {
+  island: string
+}
+
+export type Entrances = Record<string, Record<string, EntrancesValue>>;
+export type EntrancesValue = {
+  entranceName: string
+}
+export type Items = Record<string, Record<string, ItemsValue>>;
+export type ItemsValue = {
+  count: number
+}
+
+export type LocationsChecked = Record<string, Record<string, LocationsCheckedValue>>;
+export type LocationsCheckedValue = {
+  isChecked: boolean
+}
+
+export type ItemsForLocations = Record<string, Record<string, ItemsForLocationsValue>>;
+export type ItemsForLocationsValue = {
+  itemName: string
+}
 
 export default class DatabaseState {
   entrances: object
@@ -43,19 +62,12 @@ export default class DatabaseState {
   public setItem(userId: string, {
     itemName,
     count,
-    generalLocation,
-    detailedLocation,
   }: ItemPayload) {
     const newState = this._clone({
       items: true,
-      itemsForLocations: true,
     });
 
     _.set(newState.items, [itemName, userId], { count })
-    if (generalLocation && detailedLocation) {
-      _.set(newState.itemsForLocations, [DatabaseHelper.getLocationKey(generalLocation, detailedLocation)
-        , userId], { itemName })
-    }
 
     return newState;
   }
@@ -69,8 +81,58 @@ export default class DatabaseState {
       locationsChecked: true,
     });
 
-    _.set(this.locationsChecked, [DatabaseHelper.getLocationKey(generalLocation, detailedLocation), userId], { isChecked })
-  
+    _.set(newState.locationsChecked, [DatabaseHelper.getLocationKey(generalLocation, detailedLocation), userId], { isChecked })
+
+    return newState;
+  }
+
+  public setItemsForLocations(userId: string, {
+    itemName,
+    generalLocation,
+    detailedLocation,
+  }: ItemPayload) {
+    const newState = this._clone({
+      itemsForLocations: true,
+    });
+
+    _.set(newState.itemsForLocations, [DatabaseHelper.getLocationKey(generalLocation, detailedLocation), userId], { itemName: itemName ?? "" })
+
+    return newState;
+  }
+
+  public setEntrance(userId: string,
+    {
+      entranceName,
+      exitName
+    }: EntrancePayload) {
+    const newState = this._clone({
+      entrances: true,
+    });
+
+    if (entranceName) {
+      _.set(newState.entrances, [exitName, userId], { entranceName })
+    } else {
+      _.unset(newState.entrances, [exitName, userId]);
+    }
+
+    return newState;
+  }
+
+  public setIslandsForCharts(userId: string,
+    {
+      island,
+      chart
+    }: IslandsForChartPayload) {
+    const newState = this._clone({
+      islandsForCharts: true,
+    });
+
+    if (island) {
+      _.set(newState.islandsForCharts, [chart, userId], { island });
+    } else {
+      _.unset(newState.islandsForCharts, [chart, userId]);
+    }
+
     return newState;
   }
 

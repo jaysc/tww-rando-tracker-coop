@@ -25,6 +25,63 @@ export default class Launcher extends React.PureComponent {
     );
   }
 
+  static introductionContainer() {
+    return (
+      <div className="introduction">
+        <div className="content">
+          <div className="title">
+            TWW Randomizer Tracker Online
+          </div>
+          <div className="text">
+            A Tracker used to play coop.
+            <br />
+            You can find the standard version of the tracker
+            {' '}
+            <a href="https://www.wooferzfg.me/tww-rando-tracker/">here</a>
+            .
+          </div>
+          <div className="heading">
+            How to use
+          </div>
+          <div className="text">
+            Ensure all players are using the same permalink.
+            <br />
+            &quot;Room Name&quot; is used to place all users within the same room.
+            If a name already exists with the same permalink
+            , you will be placed in the existing room.
+          </div>
+          <div className="heading">
+            Modes
+          </div>
+          <div className="text">
+            The mode is set when creating the room. If you want to change the mode
+            , you must create a new room.
+            <br />
+            There are two different types of modes.
+            <ul>
+              <li>
+                &quot;Itemsync&quot;
+                <ul>
+                  <li>All tracker items, and locations are synced between all clients</li>
+                </ul>
+              </li>
+              <li>
+                &quot;Coop&quot;
+                <ul>
+                  <li>Status of tracker is shared to all players.</li>
+                  <li>
+                    Only chart mapping (randomised charts)
+                    and entrance mapping (randomised entrances) are synced.
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   constructor() {
     super();
 
@@ -279,11 +336,11 @@ export default class Launcher extends React.PureComponent {
     Launcher.openTrackerWindow(`/new/${encodedPermalink}`);
   }
 
-  launchOnline() {
+  launchOnline(mode) {
     const encodedPermalink = this.encodedPermalink();
     const { gameId } = this.state;
 
-    Launcher.openTrackerWindow(`/online/${encodedPermalink}/${gameId}`);
+    Launcher.openTrackerWindow(`/online/${mode}/${encodedPermalink}/${gameId}`);
   }
 
   launchLoadFromFileLaunchOnline() {
@@ -323,10 +380,10 @@ export default class Launcher extends React.PureComponent {
     return (
       <>
         <div className="permalink-container">
-          <div className="permalink-label">GameId:</div>
+          <div className="permalink-label">Room Name:</div>
           <div className="permalink-input">
             <input
-              placeholder="GameId"
+              placeholder="Room Name"
               className="permalink"
               onChange={(event) => {
                 event.stopPropagation();
@@ -340,18 +397,18 @@ export default class Launcher extends React.PureComponent {
           <button
             className="launcher-button"
             type="button"
-            onClick={this.launchOnline}
+            onClick={() => this.launchOnline('itemsync')}
             disabled={!gameId}
           >
-            Launch Online
+            Launch Itemsync
           </button>
           <button
             className="launcher-button"
             type="button"
-            onClick={this.loadFromFileLaunchOnline}
+            onClick={() => this.launchOnline('coop')}
             disabled={!gameId}
           >
-            Load File, Launch Online
+            Launch Coop
           </button>
         </div>
       </>
@@ -370,6 +427,7 @@ export default class Launcher extends React.PureComponent {
             />
           </div>
           <div className="settings">
+            {Launcher.introductionContainer()}
             {this.permalinkContainer()}
             {this.progressItemLocationsTable()}
             {this.additionalRandomizationOptionsTable()}

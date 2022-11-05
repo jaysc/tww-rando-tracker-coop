@@ -178,6 +178,48 @@ body {
   .attribution {
     text-shadow: 1.5px 1px rgba(0, 0, 0, 0.5);
   }
+
+  .introduction {
+    background-color: rgba(50, 50, 50, 0.4);
+    border-radius: 4px;
+    border: 1px solid #c8c8c8;
+    color: white;
+    font-size: 1.2em;
+    margin: 4px 20px;
+    max-width: 1500px;
+    padding: 0px 4px 4px 4px;
+    text-align: center;
+    text-shadow: 1.5px 1px rgba(0, 0, 0, 0.5);
+    width: 100%;
+
+    a {
+      color: rgb(57, 250, 250);
+    }
+
+    .title {
+      margin: 8px;
+      font-size: 1.3em;
+    }
+
+    .heading {
+      text-align: left;
+      font-size: 1.2em;
+      margin: 8px 0 0;
+    }
+
+    .content {
+      margin: 4px 20px;
+    }
+
+    .text {
+      line-height: 1.4em;
+      text-align: left;
+    }
+
+    ul {
+      margin: 4px 0;
+    }
+  }
 }
 
 input {
@@ -312,6 +354,21 @@ button:hover:enabled {
 
   .menu-items table {
     width: 100%;
+  }
+
+  .nayrus-pearl {
+    .coop-checked-item::before {
+      content: '';
+      display: inline-block;
+      left: 25%;
+      width: 48px;
+      height: 48px;
+      -moz-border-radius: 50%;
+      -webkit-border-radius: 50%;
+      border-radius: 50%;
+      background-color: #69b6d5;
+      position: absolute;
+    }
   }
 
   .dins-pearl {
@@ -572,6 +629,10 @@ button:hover:enabled {
   color: #a69b8d;
 }
 
+.tooltip-wrapper {
+  z-index: 1;
+}
+
 .tooltip {
   color: black;
   max-width: 300px;
@@ -791,6 +852,19 @@ button:hover:enabled {
   }
 }
 
+.coop-checked-item-chart::before {
+  content: '';
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+  background-color: #69b6d5;
+  position: absolute;
+  z-index: -1;
+}
+
 .coop-checked-item::before {
   content: '';
   display: inline-block;
@@ -801,4 +875,48 @@ button:hover:enabled {
   border-radius: 50%;
   background-color: #69b6d5;
   position: absolute;
+}
+
+.coop-checked-dungeon::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+  background-color: #715bfb;
+  position: absolute;
+}
+
+.coop-status-box {
+  width: 280px;
+  background-color: rgba(80, 80, 80, 0.85);
+  margin: 0 0 8px 0;
+  padding: 6px 5px 5px 5px;
+  white-space: normal;
+  color: white;
+  font-size: 18px;
+  z-index: 2;
+
+  .coop-status {
+    display: flex;
+  }
+
+  .connected {
+    color: lightgreen;
+  }
+
+  .disconnected {
+    color: red;
+  }
+}
+
+.darken-background {
+  background-color: rgba(0, 0, 0, 0.3);
+  background-blend-mode: darken; 
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
 }

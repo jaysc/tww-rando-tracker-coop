@@ -5,7 +5,6 @@ import React from 'react';
 import LogicHelper from '../services/logic-helper';
 import Spheres from '../services/spheres';
 
-import FoundAtTooltip from './found-at-tooltip';
 import KeyDownWrapper from './key-down-wrapper';
 import Tooltip from './tooltip';
 
@@ -16,7 +15,6 @@ class Item extends React.PureComponent {
       decrementItem,
       images,
       incrementItem,
-      databaseData,
       itemCount,
       itemName,
       setSelectedItem,
@@ -49,7 +47,7 @@ class Item extends React.PureComponent {
 
     return (
       <div
-        className={`item-container ${itemClassName} ${databaseData.maxCount > itemCount ? 'coop-checked-item' : ''}`}
+        className={`item-container ${itemClassName}`}
         onBlur={clearSelectedItem}
         onClick={incrementItemFunc}
         onContextMenu={decrementItemFunc}
@@ -70,7 +68,7 @@ class Item extends React.PureComponent {
   }
 
   render() {
-    const { databaseData, locations, spheres } = this.props;
+    const { databaseLocations, locations, spheres } = this.props;
 
     let locationContent;
     let databaseContent;
@@ -100,8 +98,8 @@ class Item extends React.PureComponent {
       );
     }
 
-    if (!_.isEmpty(databaseData?.locations)) {
-      const databaseList = _.reduce(databaseData.locations, (acc, {
+    if (!_.isEmpty(databaseLocations)) {
+      const databaseList = _.reduce(databaseLocations, (acc, {
         generalLocation, detailedLocation,
       }) => {
         const sphere = spheres.sphereForLocation(generalLocation, detailedLocation);
@@ -149,7 +147,7 @@ class Item extends React.PureComponent {
 
 Item.defaultProps = {
   decrementItem: null,
-  databaseData: {},
+  databaseLocations: [],
   locations: [],
   spheres: null,
 };
@@ -157,13 +155,10 @@ Item.defaultProps = {
 Item.propTypes = {
   clearSelectedItem: PropTypes.func.isRequired,
   decrementItem: PropTypes.func,
-  databaseData: PropTypes.exact({
-    maxCount: PropTypes.number,
-    locations: PropTypes.arrayOf(PropTypes.exact({
-      generalLocation: PropTypes.string.isRequired,
-      detailedLocation: PropTypes.string.isRequired,
-    })),
-  }),
+  databaseLocations: PropTypes.arrayOf(PropTypes.exact({
+    generalLocation: PropTypes.string.isRequired,
+    detailedLocation: PropTypes.string.isRequired,
+  })),
   images: PropTypes.arrayOf(PropTypes.string).isRequired,
   incrementItem: PropTypes.func.isRequired,
   itemCount: PropTypes.number.isRequired,

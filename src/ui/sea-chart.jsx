@@ -2,6 +2,8 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import DatabaseLogic from '../services/database-logic';
+import DatabaseState from '../services/database-state';
 import LogicCalculation from '../services/logic-calculation';
 import LogicHelper from '../services/logic-helper';
 import Spheres from '../services/spheres';
@@ -16,6 +18,8 @@ class SeaChart extends React.PureComponent {
       clearSelectedChartForIsland,
       clearSelectedItem,
       clearSelectedLocation,
+      databaseLogic,
+      databaseState,
       decrementItem,
       disableLogic,
       incrementItem,
@@ -40,6 +44,8 @@ class SeaChart extends React.PureComponent {
         clearSelectedChartForIsland={clearSelectedChartForIsland}
         clearSelectedItem={clearSelectedItem}
         clearSelectedLocation={clearSelectedLocation}
+        databaseLogic={databaseLogic}
+        databaseState={databaseState}
         decrementItem={decrementItem}
         disableLogic={disableLogic}
         key={island}
@@ -83,6 +89,8 @@ SeaChart.propTypes = {
   clearSelectedChartForIsland: PropTypes.func.isRequired,
   clearSelectedItem: PropTypes.func.isRequired,
   clearSelectedLocation: PropTypes.func.isRequired,
+  databaseLogic: PropTypes.instanceOf(DatabaseLogic).isRequired,
+  databaseState: PropTypes.instanceOf(DatabaseState).isRequired,
   decrementItem: PropTypes.func.isRequired,
   disableLogic: PropTypes.bool.isRequired,
   incrementItem: PropTypes.func.isRequired,
