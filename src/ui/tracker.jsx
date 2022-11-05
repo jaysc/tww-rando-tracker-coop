@@ -665,6 +665,7 @@ class Tracker extends React.PureComponent {
     const { entrancesListOpen } = this.state;
 
     this.setState({
+      chartListOpen: false,
       entrancesListOpen: !entrancesListOpen,
       openedChartForIsland: null,
       openedExit: null,
