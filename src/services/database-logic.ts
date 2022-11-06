@@ -490,7 +490,7 @@ export default class DatabaseLogic {
 
   private setUserId(data: OnConnect) {
     this.userId = data.userId;
-    document.cookie = `userId=${this.userId}; Secure`;
+    document.cookie = `userId=${this.userId}; Secure; SameSite=None`;
     console.log(`userId set to '${this.userId}'`);
   }
   private onJoinedRoom(data: OnJoinedRoom) {
