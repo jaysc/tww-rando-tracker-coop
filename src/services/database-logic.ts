@@ -100,6 +100,11 @@ export interface LocationPayload {
   useRoomId?: boolean
 }
 
+function getCookie(n) {
+  let a = `; ${document.cookie}`.match(`;\\s*${n}=([^;]+)`);
+  return a ? a[1] : '';
+}
+
 export default class DatabaseLogic {
   connected: boolean;
   connectingToast: Id;
@@ -221,7 +226,9 @@ export default class DatabaseLogic {
       });
       this.updateConnectedStatus(false)
     }
-    this.websocket = new WebSocket(process.env.WEBSOCKET_SERVER, "protocolOne");
+
+    const cookieUserId = getCookie('userId');
+    this.websocket = new WebSocket(process.env.WEBSOCKET_SERVER + (cookieUserId ? `?userId=${cookieUserId}` : ''), "protocolOne");
 
     this.websocket.onmessage = this.handleOnMessage.bind(this);
 
