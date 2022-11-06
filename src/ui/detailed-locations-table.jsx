@@ -66,8 +66,7 @@ class DetailedLocationsTable extends React.PureComponent {
       const databaseItemContent = [];
       _.forEach(databaseItems, (itemName) => {
         const databasePrettyItemName = LogicHelper.prettyNameForItem(itemName, null);
-
-        if (!prettyItemName === databasePrettyItemName) {
+        if (prettyItemName !== databasePrettyItemName) {
           let chartLeadsTo;
           if (LogicHelper.isRandomizedChart(itemName)) {
             const mappedIslandForChart = trackerState.getIslandFromChartMapping(itemName);

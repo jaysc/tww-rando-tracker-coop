@@ -629,10 +629,6 @@ button:hover:enabled {
   color: #a69b8d;
 }
 
-.tooltip-wrapper {
-  z-index: 1;
-}
-
 .tooltip {
   color: black;
   max-width: 300px;
@@ -877,16 +873,23 @@ button:hover:enabled {
   position: absolute;
 }
 
-.coop-checked-dungeon::before {
-  content: '';
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  -moz-border-radius: 50%;
-  -webkit-border-radius: 50%;
-  border-radius: 50%;
-  background-color: #715bfb;
-  position: absolute;
+.coop-checked-dungeon .tooltip-wrapper {
+  .item-container::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    background-color: #715bfb;
+    position: absolute;
+    z-index: -1;
+  }
+  .item-container {
+    position: absolute;
+    z-index: 1;
+  }
 }
 
 .coop-status-box {
