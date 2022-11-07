@@ -2,6 +2,7 @@ import { v4 } from "uuid";
 import _ from "lodash";
 import { Id, toast } from "react-toastify";
 import DatabaseState, { Entrances, IslandsForCharts, Items, ItemsForLocations, LocationsChecked } from "./database-state";
+import DatabaseQueue from "./database-queue";
 
 export interface IDatabaseLogic {
   userId?: string;
@@ -122,6 +123,7 @@ export default class DatabaseLogic {
   successToast: Id;
   userId: string;
   websocket: WebSocket;
+  queue: DatabaseQueue
 
   retryInterval?: NodeJS.Timeout;
 
@@ -147,6 +149,7 @@ export default class DatabaseLogic {
     this.onDataSaved = options.onDataSaved;
     this.onRoomUpdate = options.onRoomUpdate;
     this.mode = options.mode.toUpperCase() as Mode ?? Mode.COOP;
+    this.queue = new DatabaseQueue(options.onDataSaved);
 
     //This all needs to be reviewed. isn't used
     if (options.initialData) {
@@ -520,8 +523,8 @@ export default class DatabaseLogic {
     this.onJoinedRoom(data);
   }
 
-  private onDataSavedHandle(data: OnDataSaved) {
-    this.onDataSaved(data);
+  private async onDataSavedHandle(data: OnDataSaved) {
+    this.queue.Add(data);
   }
 
   public getValue(data: IslandsForCharts | LocationsChecked | Items | ItemsForLocations | Entrances) {
@@ -536,3 +539,5 @@ export default class DatabaseLogic {
     return result ?? {};
   }
 }
+
+const message = []

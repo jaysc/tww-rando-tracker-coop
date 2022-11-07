@@ -249,7 +249,7 @@ class Tracker extends React.PureComponent {
     });
   }
 
-  databaseUpdate(data) {
+  async databaseUpdate(data) {
     const { databaseLogic, databaseState, trackerState } = this.state;
 
     const newTrackerState = trackerState._clone({
@@ -347,7 +347,7 @@ class Tracker extends React.PureComponent {
       }
     }
 
-    this.updateTrackerState(newTrackerState, newDatabaseState);
+    await this.asyncUpdateTrackerState(newTrackerState, newDatabaseState);
   }
 
   incrementItem(itemName) {
@@ -441,17 +441,50 @@ class Tracker extends React.PureComponent {
   }
 
   clearRaceModeBannedLocations(dungeonName) {
-    let { trackerState: newTrackerState } = this.state;
+    const { databaseLogic, databaseState, trackerState } = this.state;
+
+    let newTrackerState = trackerState;
+    let newDatabaseState = databaseState;
 
     const raceModeBannedLocations = LogicHelper.raceModeBannedLocations(dungeonName);
 
     _.forEach(raceModeBannedLocations, ({ generalLocation, detailedLocation }) => {
       if (!newTrackerState.isLocationChecked(generalLocation, detailedLocation)) {
         newTrackerState = newTrackerState.toggleLocationChecked(generalLocation, detailedLocation);
+
+        newDatabaseState = databaseLogic.setLocation(
+          newDatabaseState,
+          { generalLocation, detailedLocation, isChecked: true },
+        );
       }
     });
 
-    this.updateTrackerState(newTrackerState);
+    this.updateTrackerState(newTrackerState, newDatabaseState);
+  }
+
+  async asyncUpdateTrackerState(newTrackerState, newDatabaseState) {
+    const {
+      logic,
+      saveData,
+      spheres,
+      trackerState,
+    } = TrackerController.refreshState(newTrackerState);
+
+    const {
+      databaseState,
+    } = this.state;
+
+    Storage.saveToStorage(saveData);
+
+    return new Promise((resolve) => {
+      this.setState({
+        databaseState: newDatabaseState ?? databaseState,
+        logic,
+        saveData,
+        spheres,
+        trackerState,
+      }, resolve);
+    });
   }
 
   updateTrackerState(newTrackerState, newDatabaseState) {
