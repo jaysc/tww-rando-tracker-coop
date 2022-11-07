@@ -10,8 +10,9 @@ export interface IDatabaseLogic {
   mode?: string;
   initialData?: InitialData;
   onConnectedStatusChanged: (status: boolean) => void;
-  databaseInitialLoad: (data: OnJoinedRoom) => void;
-  databaseUpdate: (data: OnDataSaved) => void;
+  onJoinedRoom: (data: OnJoinedRoom) => void;
+  onDataSaved: (data: OnDataSaved) => void;
+  onRoomUpdate: (data: RoomUpdateEvent) => void;
 }
 
 type InitialData = {
@@ -100,6 +101,10 @@ export interface LocationPayload {
   useRoomId?: boolean
 }
 
+export interface RoomUpdateEvent {
+  totalUsers: number
+}
+
 function getCookie(n) {
   let a = `; ${document.cookie}`.match(`;\\s*${n}=([^;]+)`);
   return a ? a[1] : '';
@@ -120,9 +125,10 @@ export default class DatabaseLogic {
 
   retryInterval?: NodeJS.Timeout;
 
-  databaseInitialLoad: (data: OnJoinedRoom) => void;
-  databaseUpdate: (data: OnDataSaved) => void;
+  onJoinedRoom: (data: OnJoinedRoom) => void;
+  onDataSaved: (data: OnDataSaved) => void;
   onConnectedStatusChanged:(status: boolean) => void;
+  onRoomUpdate: (data: RoomUpdateEvent) => void;
 
   get effectiveUserId() {
     return this.mode === Mode.ITEMSYNC ? this.roomId : this.userId;
@@ -137,8 +143,9 @@ export default class DatabaseLogic {
     this.gameId = options.gameId;
     this.permaId = options.permaId;
     this.onConnectedStatusChanged = options.onConnectedStatusChanged;
-    this.databaseInitialLoad = options.databaseInitialLoad;
-    this.databaseUpdate = options.databaseUpdate;
+    this.onJoinedRoom = options.onJoinedRoom;
+    this.onDataSaved = options.onDataSaved;
+    this.onRoomUpdate = options.onRoomUpdate;
     this.mode = options.mode.toUpperCase() as Mode ?? Mode.COOP;
 
     //This all needs to be reviewed. isn't used
@@ -487,12 +494,19 @@ export default class DatabaseLogic {
         this.joinroom();
         break;
       case "joinedRoom":
-        this.onJoinedRoom(responseData.data as OnJoinedRoom);
+        this.onJoinedRoomHandle(responseData.data as OnJoinedRoom);
         break;
       case "dataSaved":
-        this.onDataSaved(responseData.data as OnDataSaved);
+        this.onDataSavedHandle(responseData.data as OnDataSaved);
+        break;
+      case "roomUpdate":
+        this.onRoomUpdateHandle(responseData.data as RoomUpdateEvent);
         break;
     }
+  }
+
+  private onRoomUpdateHandle(data: RoomUpdateEvent) {
+    this.onRoomUpdate(data);
   }
 
   private setUserId(data: OnConnect) {
@@ -500,14 +514,14 @@ export default class DatabaseLogic {
     document.cookie = `userId=${this.userId}; Secure; SameSite=None`;
     console.log(`userId set to '${this.userId}'`);
   }
-  private onJoinedRoom(data: OnJoinedRoom) {
+  private onJoinedRoomHandle(data: OnJoinedRoom) {
     //Initial load
     this.roomId = data.id;
-    this.databaseInitialLoad(data);
+    this.onJoinedRoom(data);
   }
 
-  private onDataSaved(data: OnDataSaved) {
-    this.databaseUpdate(data);
+  private onDataSavedHandle(data: OnDataSaved) {
+    this.onDataSaved(data);
   }
 
   public getValue(data: IslandsForCharts | LocationsChecked | Items | ItemsForLocations | Entrances) {
