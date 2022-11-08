@@ -1,15 +1,15 @@
 import { OnDataSaved } from "./database-logic";
 
+export type work = {
+    data: any;
+    action: (data: any) => void | Promise<any>
+}
+
 class DatabaseQueue {
-    queue: [any?] = []
-    action: (data: OnDataSaved) => Promise<any>
+    queue: [work?] = []
     processing: boolean;
 
-    constructor(action) {
-        this.action = action;
-    }
-
-    public Add(item: any) {
+    public Add(item: work) {
         this.queue.push(item);
 
         this.Start();
@@ -28,7 +28,7 @@ class DatabaseQueue {
     private async Process() {
         const work = this.queue.shift()
         if (work){
-            await this.action(work);
+            await work.action(work.data)
         }
     }
 }

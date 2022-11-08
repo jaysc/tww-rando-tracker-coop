@@ -103,7 +103,7 @@ export interface LocationPayload {
 }
 
 export interface RoomUpdateEvent {
-  totalUsers: number
+  connectedUsers: number
 }
 
 function getCookie(n) {
@@ -113,17 +113,18 @@ function getCookie(n) {
 
 export default class DatabaseLogic {
   connected: boolean;
+  connectedUsers: number;
   connectingToast: Id;
   disconnectedToast: Id;
   gameId: string;
   initialData: InitialData;
   mode: Mode;
   permaId: string;
+  queue: DatabaseQueue = new DatabaseQueue();
   roomId: string;
   successToast: Id;
   userId: string;
   websocket: WebSocket;
-  queue: DatabaseQueue
 
   retryInterval?: NodeJS.Timeout;
 
@@ -149,7 +150,6 @@ export default class DatabaseLogic {
     this.onDataSaved = options.onDataSaved;
     this.onRoomUpdate = options.onRoomUpdate;
     this.mode = options.mode.toUpperCase() as Mode ?? Mode.COOP;
-    this.queue = new DatabaseQueue(options.onDataSaved);
 
     //This all needs to be reviewed. isn't used
     if (options.initialData) {
@@ -509,7 +509,20 @@ export default class DatabaseLogic {
   }
 
   private onRoomUpdateHandle(data: RoomUpdateEvent) {
-    this.onRoomUpdate(data);
+    let userChange = 0;
+    if (this.connectedUsers < data.connectedUsers) {
+      userChange = 1;
+      toast("User connected");
+    } else if (this.connectedUsers > data.connectedUsers) {
+      userChange = -1
+      toast("User disconnected");
+    }
+    this.connectedUsers = data.connectedUsers;
+
+    this.queue.Add({
+      data,
+      action: this.onRoomUpdate
+    });
   }
 
   private setUserId(data: OnConnect) {
@@ -520,11 +533,17 @@ export default class DatabaseLogic {
   private onJoinedRoomHandle(data: OnJoinedRoom) {
     //Initial load
     this.roomId = data.id;
-    this.onJoinedRoom(data);
+    this.queue.Add({
+      data,
+      action: this.onJoinedRoom
+    });
   }
 
   private async onDataSavedHandle(data: OnDataSaved) {
-    this.queue.Add(data);
+    this.queue.Add({
+      data,
+      action: this.onDataSaved
+    });
   }
 
   public getValue(data: IslandsForCharts | LocationsChecked | Items | ItemsForLocations | Entrances) {
