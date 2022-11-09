@@ -73,6 +73,7 @@ class Tracker extends React.PureComponent {
     this.updateOpenedExit = this.updateOpenedExit.bind(this);
     this.updateOpenedLocation = this.updateOpenedLocation.bind(this);
 
+    this.databaseUpdateUsername = this.databaseUpdateUsername.bind(this);
     this.databaseRoomUpdate = this.databaseRoomUpdate.bind(this);
     this.databaseConnectedStatusChanged = this.databaseConnectedStatusChanged.bind(this);
     this.databaseInitialLoad = this.databaseInitialLoad.bind(this);
@@ -156,6 +157,14 @@ class Tracker extends React.PureComponent {
 
     if (databaseLogic) {
       databaseLogic.connect();
+    }
+  }
+
+  databaseUpdateUsername(event) {
+    const { databaseLogic, databaseStats } = this.state;
+    const newName = event.target.value;
+    if (newName !== _.get(databaseStats.users, databaseLogic.userId)) {
+      databaseLogic.updateUsername(event.target.value);
     }
   }
 
@@ -799,8 +808,8 @@ class Tracker extends React.PureComponent {
       colorPickerOpen,
       colors,
       databaseLogic,
-      databaseStats,
       databaseState,
+      databaseStats,
       disableLogic,
       entrancesListOpen,
       isLoading,
@@ -813,8 +822,8 @@ class Tracker extends React.PureComponent {
       openedLocationIsDungeon,
       saveData,
       spheres,
-      trackSpheres,
       trackerState,
+      trackSpheres,
     } = this.state;
 
     const {
@@ -908,18 +917,22 @@ class Tracker extends React.PureComponent {
                 : <div className="disconnected">Disconnected </div>}
             </div>
             <div className="coop-status">
-              User Name:&nbsp;
-              <div className="connected">
-                {databaseStats.users[databaseLogic.userId]}
-              </div>
+              Username:&nbsp;
+              <input
+                type="text"
+                key={Math.random()}
+                onBlur={this.databaseUpdateUsername}
+                defaultValue={_.get(databaseStats.users, databaseLogic.userId, '')}
+              />
             </div>
             <div className="coop-status">
               Number of users:&nbsp;
               <div className="connected">
                 <Tooltip tooltipContent={_.size(databaseStats.users) > 0
-                  && _.map(databaseStats.users, (name, userId) => <div key={userId}>{name}</div>)}
+                  ? _.map(databaseStats.users, (name, userId) => <div key={userId}>{name}</div>)
+                  : null}
                 >
-                  {_.size(databaseStats.users)}
+                  <>{_.size(databaseStats.users)}</>
                 </Tooltip>
 
               </div>

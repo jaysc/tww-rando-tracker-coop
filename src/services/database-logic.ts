@@ -320,6 +320,7 @@ export default class DatabaseLogic {
       method: "joinRoom",
       payload: {
         name: this.gameId,
+        username: getCookie('username'),
         perma: this.permaId,
         mode: this.mode,
         initialData: this.initialData,
@@ -554,6 +555,7 @@ export default class DatabaseLogic {
     }
 
     this.users = data.users;
+    document.cookie = `username=${_.get(this.users, this.userId)}; Secure; SameSite=None`;
 
     this.queue.Add({
       data,
@@ -571,6 +573,7 @@ export default class DatabaseLogic {
     //Initial load
     this.roomId = data.id;
     this.users = data.users;
+    document.cookie = `username=${_.get(this.users, this.userId)}; Secure; SameSite=None`;
     this.queue.Add({
       data,
       action: this.onJoinedRoom
@@ -594,6 +597,17 @@ export default class DatabaseLogic {
     }
 
     return result ?? {};
+  }
+
+  public updateUsername(newName) {
+    const message = {
+      method: "setName",
+      payload: {
+        name: newName
+      },
+    };
+
+    this.send(message);
   }
 }
 
