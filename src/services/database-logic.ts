@@ -37,7 +37,7 @@ interface OnConnect {
 }
 
 export interface OnJoinedRoom {
-  connectedUsers: number;
+  users: Record<string, string>;
   entrances: Entrances;
   id: string;
   islandsForCharts: IslandsForCharts;
@@ -109,7 +109,7 @@ export interface LocationPayload {
 }
 
 export interface RoomUpdateEvent {
-  connectedUsers: number
+  users: Record<string, string>
 }
 
 function getCookie(n) {
@@ -119,7 +119,6 @@ function getCookie(n) {
 
 export default class DatabaseLogic {
   connected: boolean;
-  connectedUsers: number;
   connectingToast: Id;
   disconnectedToast: Id;
   gameId: string;
@@ -130,6 +129,7 @@ export default class DatabaseLogic {
   roomId: string;
   successToast: Id;
   userId: string;
+  users: Record<string, string>
   websocket: WebSocket;
 
   retryInterval?: NodeJS.Timeout;
@@ -545,14 +545,15 @@ export default class DatabaseLogic {
 
   private onRoomUpdateHandle(data: RoomUpdateEvent) {
     let userChange = 0;
-    if (this.connectedUsers < data.connectedUsers) {
+    if (_.size(this.users) < _.size(data.users)) {
       userChange = 1;
       toast("User connected");
-    } else if (this.connectedUsers > data.connectedUsers) {
+    } else if (_.size(this.users) > _.size(data.users)) {
       userChange = -1
       toast("User disconnected");
     }
-    this.connectedUsers = data.connectedUsers;
+
+    this.users = data.users;
 
     this.queue.Add({
       data,
@@ -569,7 +570,7 @@ export default class DatabaseLogic {
   private onJoinedRoomHandle(data: OnJoinedRoom) {
     //Initial load
     this.roomId = data.id;
-    this.connectedUsers = data.connectedUsers;
+    this.users = data.users;
     this.queue.Add({
       data,
       action: this.onJoinedRoom

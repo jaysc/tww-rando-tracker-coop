@@ -19,6 +19,7 @@ import Statistics from './statistics';
 import Storage from './storage';
 
 import 'react-toastify/dist/ReactToastify.css';
+import Tooltip from './tooltip';
 
 class Tracker extends React.PureComponent {
   constructor(props) {
@@ -35,7 +36,7 @@ class Tracker extends React.PureComponent {
       },
       databaseStats: {
         connected: false,
-        connectedUsers: 0,
+        users: {},
       },
       disableLogic: false,
       entrancesListOpen: false,
@@ -161,7 +162,7 @@ class Tracker extends React.PureComponent {
   databaseRoomUpdate(data) {
     const { databaseStats } = this.state;
 
-    const newDatabaseStats = _.merge({}, databaseStats, { connectedUsers: data.connectedUsers });
+    const newDatabaseStats = _.merge({}, databaseStats, { users: data.users });
 
     this.setState({
       databaseStats: newDatabaseStats,
@@ -243,7 +244,7 @@ class Tracker extends React.PureComponent {
 
     this.updateTrackerState(newTrackerState, newDatabaseState);
 
-    const newDatabaseStats = _.merge({}, databaseStats, { connectedUsers: data.connectedUsers });
+    const newDatabaseStats = _.merge({}, databaseStats, { users: data.users });
     this.setState({
       databaseStats: newDatabaseStats,
     });
@@ -907,9 +908,20 @@ class Tracker extends React.PureComponent {
                 : <div className="disconnected">Disconnected </div>}
             </div>
             <div className="coop-status">
+              User Name:&nbsp;
+              <div className="connected">
+                {databaseStats.users[databaseLogic.userId]}
+              </div>
+            </div>
+            <div className="coop-status">
               Number of users:&nbsp;
               <div className="connected">
-                {databaseStats.connectedUsers}
+                <Tooltip tooltipContent={_.size(databaseStats.users) > 0
+                  && _.map(databaseStats.users, (name, userId) => <div key={userId}>{name}</div>)}
+                >
+                  {_.size(databaseStats.users)}
+                </Tooltip>
+
               </div>
             </div>
             <div className="coop-status">
