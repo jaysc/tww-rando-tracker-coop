@@ -94,8 +94,11 @@ export default class DatabaseState {
     const newState = this._clone({
       itemsForLocations: true,
     });
-
-    _.set(newState.itemsForLocations, [DatabaseHelper.getLocationKey(generalLocation, detailedLocation), userId], { itemName: itemName ?? "" })
+    if (itemName){
+      _.set(newState.itemsForLocations, [DatabaseHelper.getLocationKey(generalLocation, detailedLocation), userId], { itemName })
+    } else {
+      _.unset(newState.itemsForLocations, [DatabaseHelper.getLocationKey(generalLocation, detailedLocation), userId]);
+    }
 
     return newState;
   }

@@ -17,6 +17,8 @@ import KeyDownWrapper from './key-down-wrapper';
 class Sector extends React.PureComponent {
   chestsCounter() {
     const {
+      databaseLogic,
+      databaseState,
       disableLogic,
       island,
       logic,
@@ -31,6 +33,8 @@ class Sector extends React.PureComponent {
       isDungeon: false,
       onlyProgressLocations,
       disableLogic,
+      databaseLogic,
+      databaseState,
     });
 
     const className = `chests-counter ${color}`;

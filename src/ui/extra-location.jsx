@@ -280,6 +280,8 @@ class ExtraLocation extends React.PureComponent {
 
   chestsCounter() {
     const {
+      databaseLogic,
+      databaseState,
       disableLogic,
       isDungeon,
       locationName,
@@ -295,6 +297,8 @@ class ExtraLocation extends React.PureComponent {
       isDungeon,
       onlyProgressLocations,
       disableLogic,
+      databaseLogic,
+      databaseState,
     });
 
     const className = `extra-location-chests ${color}`;

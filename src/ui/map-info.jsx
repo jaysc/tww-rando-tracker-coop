@@ -9,6 +9,8 @@ import TrackerState from '../services/tracker-state';
 class MapInfo extends React.PureComponent {
   mapInfo() {
     const {
+      databaseLogic,
+      databaseState,
       disableLogic,
       logic,
       onlyProgressLocations,
@@ -27,6 +29,8 @@ class MapInfo extends React.PureComponent {
       isDungeon: selectedLocationIsDungeon,
       onlyProgressLocations,
       disableLogic,
+      databaseLogic,
+      databaseState,
     });
 
     return (

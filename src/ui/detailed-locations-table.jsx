@@ -147,28 +147,29 @@ class DetailedLocationsTable extends React.PureComponent {
       locationText = location;
     }
 
+    const isDatabaseChecked = DatabaseHelper.isLocationCoopChecked(
+      databaseState,
+      openedLocation,
+      location,
+    );
+
+    const databaseItems = DatabaseHelper.getItemForLocation(
+      databaseLogic,
+      databaseState,
+      openedLocation,
+      location,
+    );
+
     const isLocationChecked = color === LogicCalculation.LOCATION_COLORS.CHECKED_LOCATION;
-    const isDatabaseChecked = _.some(
-      _.get(databaseState, ['locationsChecked', DatabaseHelper.getLocationKey(openedLocation, location)]),
-      (value, userId) => databaseLogic.effectiveUserId !== userId && value.isChecked,
-    );
-    const databaseItems = _.reduce(
-      _.get(databaseState, ['itemsForLocations', DatabaseHelper.getLocationKey(openedLocation, location)]),
-      (acc, itemData, userId) => {
-        if (databaseLogic.effectiveUserId !== userId) {
-          const { itemName } = itemData;
-          if (!acc.includes(itemName)) {
-            acc.push(itemName);
-          }
-        }
+    let cssColor = color;
+    if (!isLocationChecked) {
+      if (databaseItems.length > 0) {
+        cssColor = LogicCalculation.LOCATION_COLORS.COOP_CHECKED_LOCATION_ITEM;
+      } else if (!isLocationChecked && isDatabaseChecked) {
+        cssColor = LogicCalculation.LOCATION_COLORS.COOP_CHECKED_LOCATION;
+      }
+    }
 
-        return acc;
-      },
-      [],
-    );
-
-    const cssColor = (!isLocationChecked && isDatabaseChecked)
-      ? LogicCalculation.LOCATION_COLORS.COOP_CHECKED_LOCATION : color;
     const locationElement = (
       <div
         className={`detail-span ${cssColor} ${fontSizeClassName}`}

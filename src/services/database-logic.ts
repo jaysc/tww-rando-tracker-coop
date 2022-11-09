@@ -58,8 +58,10 @@ export enum Mode {
 export enum SaveDataType {
   ENTRANCE = 'ENTRANCE',
   ISLANDS_FOR_CHARTS = 'ISLANDS_FOR_CHARTS',
-  ITEM = "ITEM",
-  LOCATION = "LOCATION",
+  ITEMS_FOR_LOCATIONS = 'ITEMS_FOR_LOCATIONS',
+  ITEM = 'ITEM',
+  LOCATION = 'LOCATION',
+  RS_SETTINGS = 'RS_SETTINGS'
 }
 
 export type OnDataSaved = {
@@ -90,6 +92,13 @@ export interface ItemPayload {
   generalLocation?: string
   detailedLocation?: string
   sphere?: number
+  useRoomId?: boolean
+}
+
+export interface ItemsForLocationsPayload {
+  itemName: string
+  generalLocation: string
+  detailedLocation: string
   useRoomId?: boolean
 }
 
@@ -405,6 +414,35 @@ export default class DatabaseLogic {
     if (generalLocation && detailedLocation) {
       newDatabaseState = newDatabaseState.setItemsForLocations(useRoomId ? this.roomId :this.effectiveUserId, itemPayload);
     }
+
+    return newDatabaseState;
+  }
+
+  public setItemsForLocations(
+    databaseState: DatabaseState,
+    itemsForLocationsPayload: ItemsForLocationsPayload
+  ) {
+    const {
+      itemName,
+      generalLocation,
+      detailedLocation,
+      useRoomId
+    } = itemsForLocationsPayload;
+
+    const message = {
+      method: "set",
+      payload: {
+        type: SaveDataType.ITEMS_FOR_LOCATIONS,
+        itemName,
+        generalLocation,
+        detailedLocation,
+        useRoomId: useRoomId || this.globalUseRoom,
+      },
+    };
+
+    this.send(message);
+
+    let newDatabaseState = databaseState.setItemsForLocations(useRoomId ? this.roomId :this.effectiveUserId, itemsForLocationsPayload);
 
     return newDatabaseState;
   }
