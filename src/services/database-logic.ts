@@ -37,17 +37,14 @@ interface OnConnect {
 }
 
 export interface OnJoinedRoom {
-  id: string;
+  connectedUsers: number;
   entrances: Entrances;
+  id: string;
   islandsForCharts: IslandsForCharts;
-  //(itemname -> (User -> useritem))
   items: Items;
-
   itemsForLocation: ItemsForLocations;
-
-  // Key: generalLocation#detailedLocation
-  //(key -> (User -> useritem))
   locationsChecked: LocationsChecked;
+  mode: Mode;
 }
 
 export enum Mode {
@@ -568,9 +565,11 @@ export default class DatabaseLogic {
     document.cookie = `userId=${this.userId}; Secure; SameSite=None`;
     console.log(`userId set to '${this.userId}'`);
   }
+
   private onJoinedRoomHandle(data: OnJoinedRoom) {
     //Initial load
     this.roomId = data.id;
+    this.connectedUsers = data.connectedUsers;
     this.queue.Add({
       data,
       action: this.onJoinedRoom
