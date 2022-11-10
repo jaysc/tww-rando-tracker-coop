@@ -199,6 +199,8 @@ class LocationsTable extends React.PureComponent {
         {chartElement}
         <MapInfo
           disableLogic={disableLogic}
+          databaseLogic={databaseLogic}
+          databaseState={databaseState}
           logic={logic}
           onlyProgressLocations={onlyProgressLocations}
           selectedChartForIsland={selectedChartForIsland}

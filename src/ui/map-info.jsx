@@ -2,6 +2,8 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import DatabaseLogic from '../services/database-logic.ts';
+import DatabaseState from '../services/database-state.ts';
 import LogicCalculation from '../services/logic-calculation';
 import LogicHelper from '../services/logic-helper';
 import TrackerState from '../services/tracker-state';
@@ -113,6 +115,8 @@ MapInfo.defaultProps = {
 };
 
 MapInfo.propTypes = {
+  databaseLogic: PropTypes.instanceOf(DatabaseLogic).isRequired,
+  databaseState: PropTypes.instanceOf(DatabaseState).isRequired,
   disableLogic: PropTypes.bool.isRequired,
   logic: PropTypes.instanceOf(LogicCalculation).isRequired,
   onlyProgressLocations: PropTypes.bool.isRequired,

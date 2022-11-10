@@ -17,7 +17,6 @@ import LocationsTable from './locations-table';
 import SphereTracking from './sphere-tracking';
 import Statistics from './statistics';
 import Storage from './storage';
-
 import 'react-toastify/dist/ReactToastify.css';
 import Tooltip from './tooltip';
 
