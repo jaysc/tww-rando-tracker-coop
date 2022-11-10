@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 import _ from "lodash";
 import DatabaseHelper from "./database-helper";
 import DatabaseLogic, { EntrancePayload, IslandsForChartPayload, ItemPayload, LocationPayload, OnJoinedRoom } from "./database-logic";
@@ -27,11 +29,11 @@ export type ItemsForLocationsValue = {
 }
 
 export default class DatabaseState {
-  entrances: object
-  islandsForCharts: object
-  items: object
-  locationsChecked: object
-  itemsForLocations: object
+  entrances: Entrances
+  islandsForCharts: IslandsForCharts
+  items: Items
+  locationsChecked: LocationsChecked
+  itemsForLocations: ItemsForLocations
 
   constructor() {
     this.entrances = {};

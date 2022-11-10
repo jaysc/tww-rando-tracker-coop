@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { v4 } from "uuid";
 import _ from "lodash";
 import { Id, toast } from "react-toastify";
@@ -148,14 +149,13 @@ export default class DatabaseLogic {
   }
 
   constructor(options: IDatabaseLogic) {
-    console.log("connecting to server");
     this.gameId = options.gameId;
     this.permaId = options.permaId;
     this.onConnectedStatusChanged = options.onConnectedStatusChanged;
     this.onJoinedRoom = options.onJoinedRoom;
     this.onDataSaved = options.onDataSaved;
     this.onRoomUpdate = options.onRoomUpdate;
-    this.mode = options.mode.toUpperCase() as Mode ?? Mode.COOP;
+    this.mode = options.mode?.toUpperCase() as Mode ?? Mode.COOP;
 
     //This all needs to be reviewed. isn't used
     if (options.initialData) {
@@ -557,7 +557,7 @@ export default class DatabaseLogic {
     this.users = data.users;
     document.cookie = `username=${_.get(this.users, this.userId)}; Secure; SameSite=None`;
 
-    this.queue.Add({
+    this.queue.add({
       data,
       action: this.onRoomUpdate
     });
@@ -574,14 +574,14 @@ export default class DatabaseLogic {
     this.roomId = data.id;
     this.users = data.users;
     document.cookie = `username=${_.get(this.users, this.userId)}; Secure; SameSite=None`;
-    this.queue.Add({
+    this.queue.add({
       data,
       action: this.onJoinedRoom
     });
   }
 
   private async onDataSavedHandle(data: OnDataSaved) {
-    this.queue.Add({
+    this.queue.add({
       data,
       action: this.onDataSaved
     });

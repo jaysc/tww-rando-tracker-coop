@@ -65,7 +65,7 @@ class ItemsTable extends React.PureComponent {
     const itemImages = _.get(Images.IMAGES, ['ITEMS', itemName]);
 
     const databaseMaxCount = DatabaseHelper.getMaxCount(databaseLogic, databaseState, itemName);
-    const databaseLocations = DatabaseHelper.getDatabaseLocations(
+    const databaseLocations = DatabaseHelper.getLocationsForItem(
       databaseLogic,
       databaseState,
       itemName,

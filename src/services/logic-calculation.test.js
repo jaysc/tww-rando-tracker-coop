@@ -3,6 +3,8 @@ import _ from 'lodash';
 import TEST_ITEM_LOCATIONS from '../data/test-item-locations.json';
 import TEST_MACROS from '../data/test-macros.json';
 
+import DatabaseLogic from './database-logic';
+import DatabaseState from './database-state';
 import Locations from './locations';
 import LogicCalculation from './logic-calculation';
 import LogicHelper from './logic-helper';
@@ -751,6 +753,150 @@ describe('LogicCalculation', () => {
             numRemaining: 13,
             color: LogicCalculation.LOCATION_COLORS.AVAILABLE_LOCATION,
           });
+        });
+      });
+    });
+
+    describe('when has database locations', () => {
+      const databaseLogic = new DatabaseLogic({});
+      test('when avaliabe location is checked but has no item', () => {
+        const databaseState = new DatabaseState();
+        databaseState.itemsForLocations = {
+          "Outset Island#Mesa the Grasscutter's House": {
+          },
+          'Windfall Island#Jail - Tingle - First Gift': {
+            user1: {
+              itemName: 'leaf',
+            },
+          },
+        };
+        databaseState.locationsChecked = {
+          "Outset Island#Mesa the Grasscutter's House": {
+            user1: {
+              isChecked: true,
+            },
+          },
+          'Windfall Island#Jail - Tingle - First Gift': {
+            user1: {
+              isChecked: true,
+            },
+            user2: {
+              isChecked: true,
+            },
+            user3: {
+              isChecked: true,
+            },
+          },
+        };
+
+        const locationCounts = logic.locationCounts('Outset Island', {
+          isDungeon: false,
+          onlyProgressLocations: true,
+          disableLogic: true,
+          databaseLogic,
+          databaseState,
+        });
+
+        expect(locationCounts).toEqual({
+          numAvailable: 2,
+          numRemaining: 2,
+          color: LogicCalculation.LOCATION_COLORS.AVAILABLE_LOCATION,
+        });
+      });
+
+      test('when avaliabe location is checked and has item', () => {
+        const databaseState = new DatabaseState();
+        databaseState.itemsForLocations = {
+          "Outset Island#Mesa the Grasscutter's House": {
+            user1: {
+              itemName: 'bombs',
+            },
+          },
+          'Windfall Island#Jail - Tingle - First Gift': {
+            user1: {
+              itemName: 'leaf',
+            },
+          },
+        };
+        databaseState.locationsChecked = {
+          "Outset Island#Mesa the Grasscutter's House": {
+            user1: {
+              isChecked: true,
+            },
+          },
+          'Windfall Island#Jail - Tingle - First Gift': {
+            user1: {
+              isChecked: true,
+            },
+            user2: {
+              isChecked: true,
+            },
+            user3: {
+              isChecked: true,
+            },
+          },
+        };
+
+        const locationCounts = logic.locationCounts('Outset Island', {
+          isDungeon: false,
+          onlyProgressLocations: true,
+          disableLogic: true,
+          databaseLogic,
+          databaseState,
+        });
+
+        expect(locationCounts).toEqual({
+          numAvailable: 3,
+          numRemaining: 3,
+          color: LogicCalculation.LOCATION_COLORS.COOP_CHECKED_LOCATION_ITEM,
+        });
+      });
+
+      test('when unavaliable location is checked and has item', () => {
+        const databaseState = new DatabaseState();
+        databaseState.itemsForLocations = {
+          'Outset Island#Savage Labyrinth - Floor 50': {
+            user1: {
+              itemName: 'bombs',
+            },
+          },
+          'Windfall Island#Jail - Tingle - First Gift': {
+            user1: {
+              itemName: 'leaf',
+            },
+          },
+        };
+        databaseState.locationsChecked = {
+          'Outset Island#Savage Labyrinth - Floor 50': {
+            user1: {
+              isChecked: true,
+            },
+          },
+          'Windfall Island#Jail - Tingle - First Gift': {
+            user1: {
+              isChecked: true,
+            },
+            user2: {
+              isChecked: true,
+            },
+            user3: {
+              isChecked: true,
+            },
+          },
+        };
+
+        const locationCounts = logic.locationCounts('Outset Island', {
+          isDungeon: false,
+          onlyProgressLocations: true,
+          disableLogic: true,
+          databaseLogic,
+          databaseState,
+        });
+
+        expect(locationCounts).toEqual({
+          numAvailable: 3,
+          numRemaining: 3,
+          color: LogicCalculation.LOCATION_COLORS.AVAILABLE_LOCATION,
         });
       });
     });

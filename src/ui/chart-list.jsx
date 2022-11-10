@@ -111,7 +111,7 @@ class ChartList extends React.PureComponent {
     const isChartMapped = !_.isNil(mappedIslandForChart);
 
     const databaseMaxCount = DatabaseHelper.getMaxCount(databaseLogic, databaseState, chartName);
-    const databaseLocations = DatabaseHelper.getDatabaseLocations(
+    const databaseLocations = DatabaseHelper.getLocationsForItem(
       databaseLogic,
       databaseState,
       chartName,

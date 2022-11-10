@@ -9,23 +9,23 @@ class DatabaseQueue {
     queue: [work?] = []
     processing: boolean;
 
-    public Add(item: work) {
+    public add(item: work) {
         this.queue.push(item);
 
-        this.Start();
+        this.start();
     }
 
-    private async Start() {
+    private async start() {
         if (!this.processing && this.queue.length > 0) {
             this.processing = true;
             while (this.queue.length > 0) {
-                await this.Process();
+                await this.process();
             }
             this.processing = false;
         }
     }
 
-    private async Process() {
+    private async process() {
         const work = this.queue.shift()
         if (work){
             await work.action(work.data)

@@ -20,7 +20,7 @@ export default class DatabaseHelper {
     );
   }
 
-  public static getDatabaseLocations(databaseLogic: DatabaseLogic, databaseState: DatabaseState, itemName: string) {
+  public static getLocationsForItem(databaseLogic: DatabaseLogic, databaseState: DatabaseState, itemName: string) {
     return _.reduce(
       databaseState.itemsForLocations,
       (acc, data, location) => {
