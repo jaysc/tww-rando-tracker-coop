@@ -929,7 +929,18 @@ class Tracker extends React.PureComponent {
               Number of users:&nbsp;
               <div className="connected">
                 <Tooltip tooltipContent={_.size(databaseStats.users) > 0
-                  ? _.map(databaseStats.users, (name, userId) => <div key={userId}>{name}</div>)
+                  ? (
+                    <div className="tooltip">
+                      <div className="tooltip-title">Connected players</div>
+                      <ul>
+                        {_.map(
+                          databaseStats.users,
+                          (name, userId) => <li key={userId}>{name}</li>,
+                        )}
+                      </ul>
+                    </div>
+
+                  )
                   : null}
                 >
                   <>{_.size(databaseStats.users)}</>

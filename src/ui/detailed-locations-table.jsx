@@ -15,30 +15,53 @@ import TrackerState from '../services/tracker-state';
 import Images from './images';
 import KeyDownWrapper from './key-down-wrapper';
 import MapTable from './map-table';
-import RequirementsTooltip from './requirements-tooltip';
 import Tooltip from './tooltip';
 
 class DetailedLocationsTable extends React.PureComponent {
   static NUM_ROWS = 13;
 
-  requirementsTooltip(generalLocation, detailedLocation) {
-    const { logic } = this.props;
-
-    const requirements = logic.formattedRequirementsForLocation(generalLocation, detailedLocation);
-
-    return (
-      <RequirementsTooltip requirements={requirements} />
-    );
-  }
-
-  itemTooltip(generalLocation, detailedLocation, databaseItems) {
-    const { trackerState } = this.props;
+  itemTooltip({
+    disableLogic,
+    isLocationChecked,
+    generalLocation,
+    detailedLocation,
+    databaseItems,
+  }) {
+    const { logic, trackerState } = this.props;
 
     const itemForLocation = trackerState.getItemForLocation(generalLocation, detailedLocation);
 
+    let requirementsContent;
     let itemForLocationContent;
     let databaseItemForLocationContent;
     let prettyItemName;
+
+    if (!disableLogic && !isLocationChecked) {
+      const requirements = logic.formattedRequirementsForLocation(
+        generalLocation,
+        detailedLocation,
+      );
+
+      const requirementsList = _.map(requirements, (elements, rowIndex) => (
+        <li key={rowIndex}>
+          {
+            _.map(elements, ({ color, text }, elementIndex) => (
+              <span className={color} key={elementIndex}>{text}</span>
+            ))
+          }
+        </li>
+      ));
+
+      requirementsContent = (
+        <>
+          <div className="tooltip-title">Items Required</div>
+          <ul>
+            {requirementsList}
+          </ul>
+        </>
+      );
+    }
+
     if (!_.isNil(itemForLocation)) {
       prettyItemName = LogicHelper.prettyNameForItem(itemForLocation, null);
 
@@ -96,12 +119,13 @@ class DetailedLocationsTable extends React.PureComponent {
       }
     }
 
-    if (!itemForLocationContent && !databaseItemForLocationContent) {
+    if (!itemForLocationContent && !databaseItemForLocationContent && !requirementsContent) {
       return null;
     }
 
     return (
       <div className="tooltip">
+        {requirementsContent}
         {itemForLocationContent}
         {databaseItemForLocationContent}
       </div>
@@ -182,27 +206,22 @@ class DetailedLocationsTable extends React.PureComponent {
       </div>
     );
 
-    let locationContent;
-    if (disableLogic || isLocationChecked || databaseItems.length > 0) {
-      let itemTooltip = null;
-      if (trackSpheres) {
-        itemTooltip = this.itemTooltip(openedLocation, location, databaseItems);
-      }
-
-      locationContent = (
-        <Tooltip tooltipContent={itemTooltip}>
-          {locationElement}
-        </Tooltip>
-      );
-    } else {
-      const requirementsTooltip = this.requirementsTooltip(openedLocation, location);
-
-      locationContent = (
-        <Tooltip tooltipContent={requirementsTooltip}>
-          {locationElement}
-        </Tooltip>
-      );
+    let itemTooltip = null;
+    if (trackSpheres) {
+      itemTooltip = this.itemTooltip({
+        disableLogic,
+        isLocationChecked,
+        generalLocation: openedLocation,
+        detailedLocation: location,
+        databaseItems,
+      });
     }
+
+    const locationContent = (
+      <Tooltip tooltipContent={itemTooltip}>
+        {locationElement}
+      </Tooltip>
+    );
 
     return (
       <td key={location}>
