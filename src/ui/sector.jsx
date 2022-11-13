@@ -74,6 +74,12 @@ class Sector extends React.PureComponent {
       chartName,
     );
 
+    const databaseLocations = DatabaseHelper.getLocationsForItem(
+      databaseLogic,
+      databaseState,
+      chartName,
+    );
+
     const chartImages = _.get(Images.IMAGES, ['CHARTS', chartType]);
 
     let locations = [];
@@ -85,6 +91,7 @@ class Sector extends React.PureComponent {
       <div className={`treasure-chart ${databaseMaxCount > chartCount ? 'coop-checked-item-chart' : ''}`}>
         <Item
           clearSelectedItem={clearSelectedItem}
+          databaseLocations={databaseLocations}
           decrementItem={decrementItem}
           images={chartImages}
           incrementItem={incrementItem}
@@ -125,6 +132,12 @@ class Sector extends React.PureComponent {
       chartForIsland,
     );
 
+    const databaseLocations = DatabaseHelper.getLocationsForItem(
+      databaseLogic,
+      databaseState,
+      chartForIsland,
+    );
+
     let locations = [];
     if (trackSpheres) {
       locations = trackerState.getLocationsForItem(chartForIsland);
@@ -145,6 +158,7 @@ class Sector extends React.PureComponent {
       <div className={`treasure-chart ${databaseMaxCount > chartCount ? 'coop-checked-item-chart' : ''}`}>
         <Item
           clearSelectedItem={clearSelectedChartForIsland}
+          databaseLocations={databaseLocations}
           images={chartImages}
           incrementItem={updateOpenedChartForIslandFunc}
           itemCount={chartCount}
