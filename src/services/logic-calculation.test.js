@@ -1277,6 +1277,54 @@ describe('LogicCalculation', () => {
         });
       });
     });
+
+    describe('when has database data', () => {
+      const databaseLogic = new DatabaseLogic({});
+      test('returns correct color when location has coop-item', () => {
+        const databaseState = new DatabaseState();
+        databaseState.itemsForLocations = {
+          "Outset Island#Mesa the Grasscutter's House": {
+            user1: {
+              itemName: 'leaf',
+            },
+          },
+        };
+        databaseState.locationsChecked = {
+          "Outset Island#Mesa the Grasscutter's House": {
+            user1: {
+              isChecked: true,
+            },
+          },
+          "Outset Island#Underneath Link's House": {
+            user1: {
+              isChecked: true,
+            },
+          },
+        };
+        const locationsList = logic.locationsList('Outset Island', {
+          isDungeon: false,
+          onlyProgressLocations: true,
+          databaseLogic,
+          databaseState,
+          disableLogic: true,
+        });
+
+        expect(locationsList).toEqual([
+          {
+            location: "Underneath Link's House",
+            color: LogicCalculation.LOCATION_COLORS.COOP_CHECKED_LOCATION,
+          },
+          {
+            location: "Mesa the Grasscutter's House",
+            color: LogicCalculation.LOCATION_COLORS.COOP_CHECKED_LOCATION_ITEM,
+          },
+          {
+            location: 'Great Fairy',
+            color: LogicCalculation.LOCATION_COLORS.AVAILABLE_LOCATION,
+          },
+        ]);
+      });
+    });
   });
 
   describe('entrancesList', () => {
