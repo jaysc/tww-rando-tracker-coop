@@ -84,12 +84,12 @@ class LogicCalculation {
         generalLocation,
         detailedLocation,
       );
-      const hasCoopItem = DatabaseHelper.getItemForLocation(
+      const hasCoopItem = DatabaseHelper.hasCoopItem(
         databaseLogic,
         databaseState,
         generalLocation,
         detailedLocation,
-      ).length > 0;
+      );
 
       if (
         !this.state.isLocationChecked(generalLocation, detailedLocation)
@@ -140,12 +140,12 @@ class LogicCalculation {
         generalLocation,
         detailedLocation,
       );
-      const hasCoopItem = DatabaseHelper.getItemForLocation(
+      const hasCoopItem = DatabaseHelper.hasCoopItem(
         databaseLogic,
         databaseState,
         generalLocation,
         detailedLocation,
-      ).length > 0;
+      );
 
       const color = LogicCalculation._locationColor(
         disableLogic || isAvailable,
