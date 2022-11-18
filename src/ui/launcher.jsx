@@ -77,6 +77,29 @@ export default class Launcher extends React.PureComponent {
               </li>
             </ul>
           </div>
+          <div className="heading">
+            Notes
+          </div>
+          <div className="text">
+            <ul>
+              <li>
+                Automatic (Location - Item) selection
+                <ul>
+                  <li>
+                    When a location has tracked exactly one coop item
+                    , when other players mark the same location they will
+                    automatically gain the tracked item.
+                  </li>
+                </ul>
+              </li>
+              <li>
+                Room lifetime
+                <ul>
+                  <li>All rooms have a lifetime of 30 minutes based on the last action taken.</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     );
