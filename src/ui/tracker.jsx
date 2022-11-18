@@ -429,7 +429,7 @@ class Tracker extends React.PureComponent {
     this.updateTrackerState(newTrackerState, newDatabaseState);
   }
 
-  toggleLocationChecked(generalLocation, detailedLocation) {
+  toggleLocationChecked(generalLocation, detailedLocation, databaseItems) {
     const { databaseLogic, databaseState, trackerState } = this.state;
 
     let newTrackerState = trackerState.toggleLocationChecked(generalLocation, detailedLocation);
@@ -451,6 +451,36 @@ class Tracker extends React.PureComponent {
           detailedLocation,
         },
       });
+
+      if (databaseItems?.length === 1) {
+        const itemName = databaseItems[0];
+        newTrackerState = newTrackerState.incrementItem(itemName);
+        newTrackerState = newTrackerState.setItemForLocation(
+          itemName,
+          generalLocation,
+          detailedLocation,
+        );
+
+        newDatabaseState = databaseLogic.setItem(newDatabaseState, {
+          itemName,
+          count: newTrackerState.getItemValue(itemName),
+          generalLocation,
+          detailedLocation,
+        });
+
+        if (LogicHelper.isRandomizedChart(itemName)) {
+          const island = newTrackerState.getIslandFromChartMapping(itemName);
+          const chartForIsland = LogicHelper.chartForIslandName(island);
+
+          newTrackerState = newTrackerState.incrementItem(chartForIsland);
+          newDatabaseState = databaseLogic.setItem(newDatabaseState, {
+            itemName: chartForIsland,
+            count: newTrackerState.getItemValue(itemName),
+            generalLocation,
+            detailedLocation,
+          });
+        }
+      }
     } else {
       this.setState({ lastLocation: null });
 
@@ -670,6 +700,8 @@ class Tracker extends React.PureComponent {
     newDatabaseState = databaseLogic.setItem(newDatabaseState, {
       count: newTrackerState.getItemValue(chartForIsland),
       itemName: chartForIsland,
+      generalLocation,
+      detailedLocation,
     });
 
     this.updateTrackerState(newTrackerState, newDatabaseState);
