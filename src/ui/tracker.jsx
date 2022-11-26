@@ -466,7 +466,21 @@ class Tracker extends React.PureComponent {
         if (newTrackerState.newIncrementItemValue(itemName)
          > newTrackerState.getItemValue(itemName)) {
           newTrackerState = newTrackerState.incrementItem(itemName);
+
+          if (LogicHelper.isRandomizedChart(itemName)) {
+            const island = newTrackerState.getIslandFromChartMapping(itemName);
+            if (!_.isNil(island)) {
+              const chartForIsland = LogicHelper.chartForIslandName(island);
+
+              newTrackerState = newTrackerState.incrementItem(chartForIsland);
+              newDatabaseState = databaseLogic.setItem(newDatabaseState, {
+                itemName: chartForIsland,
+                count: newTrackerState.getItemValue(itemName),
+              });
+            }
+          }
         }
+
         newTrackerState = newTrackerState.setItemForLocation(
           itemName,
           generalLocation,
@@ -479,19 +493,6 @@ class Tracker extends React.PureComponent {
           generalLocation,
           detailedLocation,
         });
-
-        if (LogicHelper.isRandomizedChart(itemName)) {
-          const island = newTrackerState.getIslandFromChartMapping(itemName);
-          if (!_.isNil(island)) {
-            const chartForIsland = LogicHelper.chartForIslandName(island);
-
-            newTrackerState = newTrackerState.incrementItem(chartForIsland);
-            newDatabaseState = databaseLogic.setItem(newDatabaseState, {
-              itemName: chartForIsland,
-              count: newTrackerState.getItemValue(itemName),
-            });
-          }
-        }
       }
     } else {
       this.setState({ lastLocation: null });
