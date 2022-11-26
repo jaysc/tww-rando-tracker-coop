@@ -346,6 +346,15 @@ class Tracker extends React.PureComponent {
         const { chart, island } = data;
 
         _.set(newTrackerState.islandsForCharts, chart, island);
+
+        if (newTrackerState.getItemValue(chart) === 1) {
+          const chartForIsland = LogicHelper.chartForIslandName(island);
+          _.set(newTrackerState.items, chartForIsland, 1);
+          newDatabaseState = databaseLogic.setItem(newDatabaseState, {
+            itemName: chartForIsland,
+            count: 1,
+          });
+        }
       } else if (data.type === SaveDataType.ITEM) {
         const {
           itemName, count, generalLocation, detailedLocation,
