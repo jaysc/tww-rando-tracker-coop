@@ -83,6 +83,12 @@ export default class Launcher extends React.PureComponent {
           <div className="text">
             <ul>
               <li>
+                Yellow Location (Coop mode)
+                <ul>
+                  <li>Yellow locations means the location contains a progressive item.</li>
+                </ul>
+              </li>
+              <li>
                 Automatic (Location - Item) selection
                 <ul>
                   <li>
