@@ -547,11 +547,19 @@ export default class DatabaseLogic {
   private onRoomUpdateHandle(data: RoomUpdateEvent) {
     let userChange = 0;
     if (_.size(this.users) < _.size(data.users)) {
-      userChange = 1;
-      toast("User connected");
+      const connectedUser = _.find(data.users, (username, userId) => {
+        return _.isNil(_.get(this.users, userId, null));
+      });
+      if (connectedUser) {
+        toast(`${connectedUser} connected`);
+      }
     } else if (_.size(this.users) > _.size(data.users)) {
-      userChange = -1
-      toast("User disconnected");
+      const disconnectedUser = _.find(this.users, (username, userId) => {
+        return _.isNil(_.get(data.users, userId, null));
+      });
+      if (disconnectedUser) {
+        toast(`${disconnectedUser} disconnected`);
+      }
     }
 
     this.users = data.users;
