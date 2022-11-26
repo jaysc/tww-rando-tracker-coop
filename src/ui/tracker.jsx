@@ -700,8 +700,6 @@ class Tracker extends React.PureComponent {
     newDatabaseState = databaseLogic.setItem(newDatabaseState, {
       count: newTrackerState.getItemValue(chartForIsland),
       itemName: chartForIsland,
-      generalLocation,
-      detailedLocation,
     });
 
     this.updateTrackerState(newTrackerState, newDatabaseState);
