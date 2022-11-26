@@ -107,6 +107,7 @@ class Item extends React.PureComponent {
         const locationName = `${generalLocation} | ${detailedLocation}`;
 
         if (!existingLocation.includes(locationName)) {
+          existingLocation.push(locationName);
           acc.push((
             <li key={locationName}>
               {`[${sphereText}] ${locationName}`}
