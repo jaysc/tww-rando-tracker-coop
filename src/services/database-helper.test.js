@@ -1,6 +1,8 @@
 import DatabaseHelper from './database-helper.ts';
 import DatabaseLogic from './database-logic.ts';
 import DatabaseState from './database-state.ts';
+import Permalink from './permalink';
+import Settings from './settings';
 
 describe('DatabaseHelper', () => {
   const databaseLogic = new DatabaseLogic({});
@@ -215,6 +217,259 @@ describe('DatabaseHelper', () => {
         'newDetailed',
       ))
         .toEqual(['leaf', 'bottle']);
+    });
+  });
+
+  describe('hasCoopItem', () => {
+    describe('with logic', () => {
+      test('returns true when you do not have the item', () => {
+        const databaseState = new DatabaseState();
+        databaseState.itemsForLocations = {
+          'newGeneral#doNotHaveItem': {
+            user1: {
+              itemName: 'bombs',
+            },
+          },
+        };
+
+        expect(DatabaseHelper.hasCoopItem(
+          databaseLogic,
+          databaseState,
+          'newGeneral',
+          'doNotHaveItem',
+        ))
+          .toEqual(true);
+      });
+
+      test('returns false when only you have the item', () => {
+        const databaseState = new DatabaseState();
+        databaseState.itemsForLocations = {
+          'generalLocation#detailedLocation': {
+            [effectiveId]: {
+              itemName: 'bombs',
+            },
+          },
+        };
+
+        expect(DatabaseHelper.hasCoopItem(
+          databaseLogic,
+          databaseState,
+          'generalLocation',
+          'detailedLocation',
+        ))
+          .toEqual(false);
+      });
+
+      test('returns false when treasure charts are off and item is treasure chart', () => {
+        Settings.initializeRaw({});
+
+        const databaseState = new DatabaseState();
+        databaseState.itemsForLocations = {
+          'newGeneral#doNotHaveItem': {
+            user1: {
+              itemName: 'Treasure Chart 5',
+            },
+          },
+        };
+
+        expect(DatabaseHelper.hasCoopItem(
+          databaseLogic,
+          databaseState,
+          'newGeneral',
+          'doNotHaveItem',
+        ))
+          .toEqual(false);
+      });
+
+      test('returns false when triforce charts are off and item is triforce chart', () => {
+        Settings.initializeRaw({});
+        const databaseState = new DatabaseState();
+        databaseState.itemsForLocations = {
+          'newGeneral#doNotHaveItem': {
+            user1: {
+              itemName: 'Treasure Chart 5',
+            },
+          },
+        };
+
+        expect(DatabaseHelper.hasCoopItem(
+          databaseLogic,
+          databaseState,
+          'newGeneral',
+          'doNotHaveItem',
+        ))
+          .toEqual(false);
+      });
+
+      test('returns false when misc settings are off and item is tingle statue', () => {
+        Settings.initializeRaw({});
+
+        const databaseState = new DatabaseState();
+        databaseState.itemsForLocations = {
+          'newGeneral#doNotHaveItem': {
+            user1: {
+              itemName: 'Tingle Statue',
+            },
+          },
+        };
+
+        expect(DatabaseHelper.hasCoopItem(
+          databaseLogic,
+          databaseState,
+          'newGeneral',
+          'doNotHaveItem',
+        ))
+          .toEqual(false);
+      });
+
+      describe('and treasure charts are on', () => {
+        test('returns true when item is treasure Chart', () => {
+          Settings.initializeRaw({
+            options: {
+              [Permalink.OPTIONS.PROGRESSION_TREASURE_CHARTS]: true,
+            },
+          });
+
+          const databaseState = new DatabaseState();
+          databaseState.itemsForLocations = {
+            'newGeneral#doNotHaveItem': {
+              user1: {
+                itemName: 'Treasure Chart 5',
+              },
+            },
+          };
+
+          expect(DatabaseHelper.hasCoopItem(
+            databaseLogic,
+            databaseState,
+            'newGeneral',
+            'doNotHaveItem',
+          ))
+            .toEqual(true);
+        });
+      });
+
+      describe('and triforce charts are on', () => {
+        test('returns true when item is triforce Chart', () => {
+          Settings.initializeRaw({
+            options: {
+              [Permalink.OPTIONS.PROGRESSION_TRIFORCE_CHARTS]: true,
+            },
+          });
+
+          const databaseState = new DatabaseState();
+          databaseState.itemsForLocations = {
+            'newGeneral#doNotHaveItem': {
+              user1: {
+                itemName: 'Triforce Chart 5',
+              },
+            },
+          };
+
+          expect(DatabaseHelper.hasCoopItem(
+            databaseLogic,
+            databaseState,
+            'newGeneral',
+            'doNotHaveItem',
+          ))
+            .toEqual(true);
+        });
+      });
+
+      describe('and misc settings are on', () => {
+        test('returns true when item is tingle statue', () => {
+          Settings.initializeRaw({
+            options: {
+              [Permalink.OPTIONS.PROGRESSION_MISC]: true,
+            },
+          });
+
+          const databaseState = new DatabaseState();
+          databaseState.itemsForLocations = {
+            'newGeneral#doNotHaveItem': {
+              user1: {
+                itemName: 'Tingle Statue',
+              },
+            },
+          };
+
+          expect(DatabaseHelper.hasCoopItem(
+            databaseLogic,
+            databaseState,
+            'newGeneral',
+            'doNotHaveItem',
+          ))
+            .toEqual(true);
+        });
+      });
+    });
+
+    describe('without logic', () => {
+      test('return true for treasure chart', () => {
+        Settings.initializeRaw({});
+
+        const databaseState = new DatabaseState();
+        databaseState.itemsForLocations = {
+          'newGeneral#doNotHaveItem': {
+            user1: {
+              itemName: 'Treasure Chart 2',
+            },
+          },
+        };
+
+        expect(DatabaseHelper.hasCoopItem(
+          databaseLogic,
+          databaseState,
+          'newGeneral',
+          'doNotHaveItem',
+          true,
+        ))
+          .toEqual(true);
+      });
+
+      test('return true for triforce chart', () => {
+        Settings.initializeRaw({});
+
+        const databaseState = new DatabaseState();
+        databaseState.itemsForLocations = {
+          'newGeneral#doNotHaveItem': {
+            user1: {
+              itemName: 'Triforce Chart 2',
+            },
+          },
+        };
+
+        expect(DatabaseHelper.hasCoopItem(
+          databaseLogic,
+          databaseState,
+          'newGeneral',
+          'doNotHaveItem',
+          true,
+        ))
+          .toEqual(true);
+      });
+
+      test('return true for tingle statue', () => {
+        Settings.initializeRaw({});
+
+        const databaseState = new DatabaseState();
+        databaseState.itemsForLocations = {
+          'newGeneral#doNotHaveItem': {
+            user1: {
+              itemName: 'Tingle Statue',
+            },
+          },
+        };
+
+        expect(DatabaseHelper.hasCoopItem(
+          databaseLogic,
+          databaseState,
+          'newGeneral',
+          'doNotHaveItem',
+          true,
+        ))
+          .toEqual(true);
+      });
     });
   });
 

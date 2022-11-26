@@ -76,8 +76,8 @@ export default class DatabaseHelper {
     const isMisc = Settings.getOptionValue(Permalink.OPTIONS.PROGRESSION_MISC)
 
     const result = this.getItemForLocation(databaseLogic, databaseState, generalLocation, detailedLocation);
-
-    if (disableLogic) {
+    
+    if (!_.isNil(disableLogic)) {
       return result.length > 0;
     } else {
       return _.reduce(result, (acc, itemName) => {
