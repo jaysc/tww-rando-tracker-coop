@@ -66,6 +66,10 @@ export default class DatabaseHelper {
     );
   }
 
+  private static isIgnoredItem(item: string): boolean {
+    return /Compass|(Dungeon Map)/.test(item)
+  }
+
   public static hasCoopItem(databaseLogic: DatabaseLogic
     , databaseState: DatabaseState
     , generalLocation: string
@@ -93,7 +97,7 @@ export default class DatabaseHelper {
           if (isMisc) {
             acc += 1;
           }
-        } else {
+        } else if (!this.isIgnoredItem(itemName)) {
           acc += 1;
         }
 
