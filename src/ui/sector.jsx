@@ -132,15 +132,20 @@ class Sector extends React.PureComponent {
       chartForIsland,
     );
 
-    const databaseLocations = DatabaseHelper.getLocationsForItem(
-      databaseLogic,
-      databaseState,
-      chartForIsland,
-    );
+    const chartItem = trackerState.getChartFromChartMapping(island);
+
+    let databaseLocations = [];
+    if (!_.isNil(chartItem)) {
+      databaseLocations = DatabaseHelper.getLocationsForItem(
+        databaseLogic,
+        databaseState,
+        chartItem,
+      );
+    }
 
     let locations = [];
     if (trackSpheres) {
-      locations = trackerState.getLocationsForItem(chartForIsland);
+      locations = trackerState.getLocationsForItem(chartItem);
     }
 
     const updateOpenedChartForIslandFunc = () => {
