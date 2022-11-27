@@ -879,6 +879,7 @@ button:hover:enabled {
   border-radius: 50%;
   background-color: #69b6d5;
   position: absolute;
+  z-index: -1;
 }
 
 .coop-checked-dungeon,
