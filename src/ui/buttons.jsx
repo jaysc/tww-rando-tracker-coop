@@ -82,10 +82,11 @@ class Buttons extends React.PureComponent {
           Show Location Logic
         </button>
         <button
+          disabled
           onClick={toggleTrackSpheres}
           type="button"
         >
-          <input type="checkbox" className="button-checkbox" checked={trackSpheres} readOnly />
+          <input disabled type="checkbox" className="button-checkbox" checked={trackSpheres} readOnly />
           Track Spheres
         </button>
         <button
