@@ -77,20 +77,19 @@ class ItemsTable extends React.PureComponent {
     }
 
     return (
-      <div className={`${databaseMaxCount > itemCount ? 'coop-checked-item' : ''}`}>
-        <Item
-          clearSelectedItem={this.clearSelectedItem}
-          databaseLocations={databaseLocations}
-          decrementItem={decrementItem}
-          images={itemImages}
-          incrementItem={incrementItem}
-          itemCount={itemCount}
-          itemName={itemName}
-          locations={locations}
-          setSelectedItem={this.setSelectedItem}
-          spheres={spheres}
-        />
-      </div>
+      <Item
+        clearSelectedItem={this.clearSelectedItem}
+        databaseLocations={databaseLocations}
+        databaseMaxCount={databaseMaxCount}
+        decrementItem={decrementItem}
+        images={itemImages}
+        incrementItem={incrementItem}
+        itemCount={itemCount}
+        itemName={itemName}
+        locations={locations}
+        setSelectedItem={this.setSelectedItem}
+        spheres={spheres}
+      />
     );
   }
 

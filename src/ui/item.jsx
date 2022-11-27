@@ -9,9 +9,10 @@ import KeyDownWrapper from './key-down-wrapper';
 import Tooltip from './tooltip';
 
 class Item extends React.PureComponent {
-  item() {
+  item({ databaseContent } = {}) {
     const {
       clearSelectedItem,
+      databaseMaxCount,
       decrementItem,
       images,
       incrementItem,
@@ -44,10 +45,11 @@ class Item extends React.PureComponent {
     };
 
     const setSelectedItemFunc = () => setSelectedItem(itemName);
-
+    const hasCoopLocation = itemCount !== maxItemCount
+      && (!_.isNil(databaseContent) || databaseMaxCount > itemCount);
     return (
       <div
-        className={`item-container ${itemClassName}`}
+        className={`item-container ${hasCoopLocation ? 'coop-item' : ''} ${itemClassName}`}
         onBlur={clearSelectedItem}
         onClick={incrementItemFunc}
         onContextMenu={decrementItemFunc}
@@ -67,7 +69,7 @@ class Item extends React.PureComponent {
     );
   }
 
-  render() {
+  tooltipCalculation() {
     const { databaseLocations, locations, spheres } = this.props;
 
     let locationContent;
@@ -128,6 +130,15 @@ class Item extends React.PureComponent {
       }
     }
 
+    return {
+      locationContent,
+      databaseContent,
+    };
+  }
+
+  render() {
+    const { locationContent, databaseContent } = this.tooltipCalculation();
+
     if (locationContent || databaseContent) {
       const foundAtTooltip = (
         <div className="tooltip item-location">
@@ -135,9 +146,10 @@ class Item extends React.PureComponent {
           {databaseContent}
         </div>
       );
+
       return (
         <Tooltip tooltipContent={foundAtTooltip}>
-          {this.item()}
+          {this.item({ databaseContent })}
         </Tooltip>
       );
     }
@@ -147,8 +159,9 @@ class Item extends React.PureComponent {
 }
 
 Item.defaultProps = {
-  decrementItem: null,
   databaseLocations: [],
+  databaseMaxCount: 0,
+  decrementItem: null,
   locations: [],
   spheres: null,
 };
@@ -160,6 +173,7 @@ Item.propTypes = {
     generalLocation: PropTypes.string.isRequired,
     detailedLocation: PropTypes.string.isRequired,
   })),
+  databaseMaxCount: PropTypes.number,
   images: PropTypes.arrayOf(PropTypes.string).isRequired,
   incrementItem: PropTypes.func.isRequired,
   itemCount: PropTypes.number.isRequired,

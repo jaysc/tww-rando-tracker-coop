@@ -88,10 +88,11 @@ class Sector extends React.PureComponent {
     }
 
     return (
-      <div className={`treasure-chart ${databaseMaxCount > chartCount ? 'coop-checked-item-chart' : ''}`}>
+      <div className="treasure-chart">
         <Item
           clearSelectedItem={clearSelectedItem}
           databaseLocations={databaseLocations}
+          databaseMaxCount={databaseMaxCount}
           decrementItem={decrementItem}
           images={chartImages}
           incrementItem={incrementItem}
@@ -160,10 +161,11 @@ class Sector extends React.PureComponent {
     };
 
     return (
-      <div className={`treasure-chart ${databaseMaxCount > chartCount ? 'coop-checked-item-chart' : ''}`}>
+      <div className="treasure-chart">
         <Item
           clearSelectedItem={clearSelectedChartForIsland}
           databaseLocations={databaseLocations}
+          databaseMaxCount={databaseMaxCount}
           images={chartImages}
           incrementItem={updateOpenedChartForIslandFunc}
           itemCount={chartCount}

@@ -125,10 +125,11 @@ class ExtraLocation extends React.PureComponent {
     }
 
     return (
-      <div className={`dungeon-item small-key ${databaseMaxCount > smallKeyCount ? 'coop-checked-dungeon' : ''}`}>
+      <div className="dungeon-item small-key">
         <Item
           clearSelectedItem={clearSelectedItem}
           databaseLocations={databaseLocations}
+          databaseMaxCount={databaseMaxCount}
           decrementItem={decrementItem}
           images={smallKeyImages}
           incrementItem={incrementItem}
@@ -174,10 +175,11 @@ class ExtraLocation extends React.PureComponent {
     }
 
     return (
-      <div className={`dungeon-item big-key ${databaseMaxCount > bigKeyCount ? 'coop-checked-dungeon' : ''}`}>
+      <div className="dungeon-item big-key">
         <Item
           clearSelectedItem={clearSelectedItem}
           databaseLocations={databaseLocations}
+          databaseMaxCount={databaseMaxCount}
           decrementItem={decrementItem}
           images={bigKeyImages}
           incrementItem={incrementItem}
