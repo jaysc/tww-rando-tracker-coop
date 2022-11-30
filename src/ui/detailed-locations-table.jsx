@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import DatabaseHelper from '../services/database-helper.ts';
-import DatabaseLogic from '../services/database-logic.ts';
 import DatabaseState from '../services/database-state.ts';
 import LogicCalculation from '../services/logic-calculation';
 import LogicHelper from '../services/logic-helper';
@@ -143,7 +142,6 @@ class DetailedLocationsTable extends React.PureComponent {
     } = locationInfo;
 
     const {
-      databaseLogic,
       databaseState,
       disableLogic,
       openedLocation,
@@ -170,7 +168,6 @@ class DetailedLocationsTable extends React.PureComponent {
     }
 
     const databaseItems = DatabaseHelper.getItemForLocation(
-      databaseLogic,
       databaseState,
       openedLocation,
       location,
@@ -220,7 +217,6 @@ class DetailedLocationsTable extends React.PureComponent {
     const {
       clearOpenedMenus,
       clearRaceModeBannedLocations,
-      databaseLogic,
       databaseState,
       disableLogic,
       logic,
@@ -237,7 +233,6 @@ class DetailedLocationsTable extends React.PureComponent {
     const detailedLocations = logic.locationsList(
       openedLocation,
       {
-        databaseLogic,
         databaseState,
         disableLogic,
         isDungeon: openedLocationIsDungeon,
@@ -292,7 +287,6 @@ class DetailedLocationsTable extends React.PureComponent {
 DetailedLocationsTable.propTypes = {
   clearOpenedMenus: PropTypes.func.isRequired,
   clearRaceModeBannedLocations: PropTypes.func.isRequired,
-  databaseLogic: PropTypes.instanceOf(DatabaseLogic).isRequired,
   databaseState: PropTypes.instanceOf(DatabaseState).isRequired,
   disableLogic: PropTypes.bool.isRequired,
   logic: PropTypes.instanceOf(LogicCalculation).isRequired,

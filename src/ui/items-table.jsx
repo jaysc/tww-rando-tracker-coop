@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import DatabaseHelper from '../services/database-helper.ts';
-import DatabaseLogic from '../services/database-logic.ts';
 import DatabaseState from '../services/database-state.ts';
 import LogicHelper from '../services/logic-helper';
 import Spheres from '../services/spheres';
@@ -52,7 +51,6 @@ class ItemsTable extends React.PureComponent {
 
   item(itemName, showLocationTooltip = true) {
     const {
-      databaseLogic,
       databaseState,
       decrementItem,
       incrementItem,
@@ -64,9 +62,8 @@ class ItemsTable extends React.PureComponent {
     const itemCount = trackerState.getItemValue(itemName);
     const itemImages = _.get(Images.IMAGES, ['ITEMS', itemName]);
 
-    const databaseMaxCount = DatabaseHelper.getMaxCount(databaseLogic, databaseState, itemName);
+    const databaseMaxCount = DatabaseHelper.getMaxCount(databaseState, itemName);
     const databaseLocations = DatabaseHelper.getLocationsForItem(
-      databaseLogic,
       databaseState,
       itemName,
     );
@@ -220,7 +217,6 @@ ItemsTable.defaultProps = {
 
 ItemsTable.propTypes = {
   backgroundColor: PropTypes.string,
-  databaseLogic: PropTypes.instanceOf(DatabaseLogic).isRequired,
   databaseState: PropTypes.instanceOf(DatabaseState).isRequired,
   decrementItem: PropTypes.func.isRequired,
   incrementItem: PropTypes.func.isRequired,

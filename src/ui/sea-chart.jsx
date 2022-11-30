@@ -18,7 +18,6 @@ class SeaChart extends React.PureComponent {
       clearSelectedChartForIsland,
       clearSelectedItem,
       clearSelectedLocation,
-      databaseLogic,
       databaseState,
       decrementItem,
       disableLogic,
@@ -45,7 +44,6 @@ class SeaChart extends React.PureComponent {
         clearSelectedChartForIsland={clearSelectedChartForIsland}
         clearSelectedItem={clearSelectedItem}
         clearSelectedLocation={clearSelectedLocation}
-        databaseLogic={databaseLogic}
         databaseState={databaseState}
         decrementItem={decrementItem}
         disableLogic={disableLogic}
@@ -91,7 +89,6 @@ SeaChart.propTypes = {
   clearSelectedChartForIsland: PropTypes.func.isRequired,
   clearSelectedItem: PropTypes.func.isRequired,
   clearSelectedLocation: PropTypes.func.isRequired,
-  databaseLogic: PropTypes.instanceOf(DatabaseLogic).isRequired,
   databaseState: PropTypes.instanceOf(DatabaseState).isRequired,
   decrementItem: PropTypes.func.isRequired,
   disableLogic: PropTypes.bool.isRequired,

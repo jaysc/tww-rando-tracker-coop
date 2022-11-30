@@ -68,7 +68,6 @@ class LogicCalculation {
     isDungeon,
     onlyProgressLocations,
     disableLogic,
-    databaseLogic,
     databaseState,
     hideCoopItemLocations,
   }) {
@@ -90,7 +89,6 @@ class LogicCalculation {
         detailedLocation,
       );
       const hasCoopItem = DatabaseHelper.hasCoopItem(
-        databaseLogic,
         databaseState,
         generalLocation,
         detailedLocation,
@@ -129,7 +127,7 @@ class LogicCalculation {
   }
 
   locationsList(generalLocation, {
-    isDungeon, onlyProgressLocations, databaseLogic, databaseState, disableLogic,
+    isDungeon, onlyProgressLocations, databaseState, disableLogic,
   }) {
     const detailedLocations = LogicHelper.filterDetailedLocations(
       generalLocation,
@@ -146,7 +144,6 @@ class LogicCalculation {
         detailedLocation,
       );
       const hasCoopItem = DatabaseHelper.hasCoopItem(
-        databaseLogic,
         databaseState,
         generalLocation,
         detailedLocation,

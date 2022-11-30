@@ -62,6 +62,8 @@ describe('LogicCalculation', () => {
 
     LogicHelper.initialize();
 
+    DatabaseLogic.initialize({});
+
     logic = new LogicCalculation(TrackerState.default());
   };
 
@@ -758,7 +760,6 @@ describe('LogicCalculation', () => {
     });
 
     describe('when has database locations', () => {
-      const databaseLogic = new DatabaseLogic({});
       test('when avaliabe location is checked but has no item', () => {
         const databaseState = new DatabaseState();
         databaseState.itemsForLocations = {
@@ -793,7 +794,6 @@ describe('LogicCalculation', () => {
           isDungeon: false,
           onlyProgressLocations: true,
           disableLogic: true,
-          databaseLogic,
           databaseState,
         });
 
@@ -841,7 +841,6 @@ describe('LogicCalculation', () => {
           isDungeon: false,
           onlyProgressLocations: true,
           disableLogic: true,
-          databaseLogic,
           databaseState,
         });
 
@@ -889,7 +888,6 @@ describe('LogicCalculation', () => {
           isDungeon: false,
           onlyProgressLocations: true,
           disableLogic: true,
-          databaseLogic,
           databaseState,
         });
 
@@ -1279,7 +1277,6 @@ describe('LogicCalculation', () => {
     });
 
     describe('when has database data', () => {
-      const databaseLogic = new DatabaseLogic({});
       test('returns correct color when location has coop-item', () => {
         const databaseState = new DatabaseState();
         databaseState.itemsForLocations = {
@@ -1304,7 +1301,6 @@ describe('LogicCalculation', () => {
         const locationsList = logic.locationsList('Outset Island', {
           isDungeon: false,
           onlyProgressLocations: true,
-          databaseLogic,
           databaseState,
           disableLogic: true,
         });

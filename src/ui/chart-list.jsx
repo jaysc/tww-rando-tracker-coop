@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import DatabaseHelper from '../services/database-helper.ts';
-import DatabaseLogic from '../services/database-logic.ts';
 import DatabaseState from '../services/database-state.ts';
 import LogicCalculation from '../services/logic-calculation';
 import LogicHelper from '../services/logic-helper';
@@ -93,7 +92,6 @@ class ChartList extends React.PureComponent {
     }
 
     const {
-      databaseLogic,
       databaseState,
       incrementItem,
       spheres,
@@ -110,9 +108,8 @@ class ChartList extends React.PureComponent {
     );
     const isChartMapped = !_.isNil(mappedIslandForChart);
 
-    const databaseMaxCount = DatabaseHelper.getMaxCount(databaseLogic, databaseState, chartName);
+    const databaseMaxCount = DatabaseHelper.getMaxCount(databaseState, chartName);
     const databaseLocations = DatabaseHelper.getLocationsForItem(
-      databaseLogic,
       databaseState,
       chartName,
     );
@@ -270,7 +267,6 @@ ChartList.defaultProps = {
 
 ChartList.propTypes = {
   clearOpenedMenus: PropTypes.func.isRequired,
-  databaseLogic: PropTypes.instanceOf(DatabaseLogic).isRequired,
   databaseState: PropTypes.instanceOf(DatabaseState).isRequired,
   incrementItem: PropTypes.func.isRequired,
   openedChartForIsland: PropTypes.string,

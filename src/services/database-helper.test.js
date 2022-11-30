@@ -5,10 +5,10 @@ import Permalink from './permalink';
 import Settings from './settings';
 
 describe('DatabaseHelper', () => {
-  const databaseLogic = new DatabaseLogic({});
+  DatabaseLogic.initialize({});
   const effectiveId = 'effective-user-id';
 
-  databaseLogic.userId = effectiveId;
+  DatabaseLogic.userId = effectiveId;
 
   describe('getLocationKey', () => {
     test('returns the correct key', () => {
@@ -35,7 +35,7 @@ describe('DatabaseHelper', () => {
         },
       };
 
-      expect(DatabaseHelper.getMaxCount(databaseLogic, databaseState, 'bombs')).toEqual(0);
+      expect(DatabaseHelper.getMaxCount(databaseState, 'bombs')).toEqual(0);
     });
 
     test('returns 0 when item not found', () => {
@@ -48,7 +48,7 @@ describe('DatabaseHelper', () => {
         },
       };
 
-      expect(DatabaseHelper.getMaxCount(databaseLogic, databaseState, 'bombs')).toEqual(0);
+      expect(DatabaseHelper.getMaxCount(databaseState, 'bombs')).toEqual(0);
     });
 
     test('returns maxCount when userId is not effectiveId', () => {
@@ -78,7 +78,7 @@ describe('DatabaseHelper', () => {
         },
       };
 
-      expect(DatabaseHelper.getMaxCount(databaseLogic, databaseState, 'bombs')).toEqual(200);
+      expect(DatabaseHelper.getMaxCount(databaseState, 'bombs')).toEqual(200);
     });
   });
 
@@ -101,7 +101,7 @@ describe('DatabaseHelper', () => {
         },
       };
 
-      expect(DatabaseHelper.getLocationsForItem(databaseLogic, databaseState, 'bombs'))
+      expect(DatabaseHelper.getLocationsForItem(databaseState, 'bombs'))
         .toEqual([]);
     });
 
@@ -126,7 +126,7 @@ describe('DatabaseHelper', () => {
         },
       };
 
-      expect(DatabaseHelper.getLocationsForItem(databaseLogic, databaseState, 'bombs'))
+      expect(DatabaseHelper.getLocationsForItem(databaseState, 'bombs'))
         .toEqual([{ generalLocation: 'generalLocation', detailedLocation: 'detailedLocation' }]);
     });
   });
@@ -151,7 +151,6 @@ describe('DatabaseHelper', () => {
       };
 
       expect(DatabaseHelper.getItemForLocation(
-        databaseLogic,
         databaseState,
         'generalLocation',
         'detailedLocation',
@@ -178,7 +177,6 @@ describe('DatabaseHelper', () => {
       };
 
       expect(DatabaseHelper.getItemForLocation(
-        databaseLogic,
         databaseState,
         'random1',
         'random2',
@@ -211,7 +209,6 @@ describe('DatabaseHelper', () => {
       };
 
       expect(DatabaseHelper.getItemForLocation(
-        databaseLogic,
         databaseState,
         'newGeneral',
         'newDetailed',
@@ -233,7 +230,6 @@ describe('DatabaseHelper', () => {
         };
 
         expect(DatabaseHelper.hasCoopItem(
-          databaseLogic,
           databaseState,
           'newGeneral',
           'doNotHaveItem',
@@ -252,7 +248,6 @@ describe('DatabaseHelper', () => {
         };
 
         expect(DatabaseHelper.hasCoopItem(
-          databaseLogic,
           databaseState,
           'generalLocation',
           'detailedLocation',
@@ -273,7 +268,6 @@ describe('DatabaseHelper', () => {
         };
 
         expect(DatabaseHelper.hasCoopItem(
-          databaseLogic,
           databaseState,
           'newGeneral',
           'doNotHaveItem',
@@ -293,7 +287,6 @@ describe('DatabaseHelper', () => {
         };
 
         expect(DatabaseHelper.hasCoopItem(
-          databaseLogic,
           databaseState,
           'newGeneral',
           'doNotHaveItem',
@@ -314,7 +307,6 @@ describe('DatabaseHelper', () => {
         };
 
         expect(DatabaseHelper.hasCoopItem(
-          databaseLogic,
           databaseState,
           'newGeneral',
           'doNotHaveItem',
@@ -340,7 +332,6 @@ describe('DatabaseHelper', () => {
           };
 
           expect(DatabaseHelper.hasCoopItem(
-            databaseLogic,
             databaseState,
             'newGeneral',
             'doNotHaveItem',
@@ -367,7 +358,6 @@ describe('DatabaseHelper', () => {
           };
 
           expect(DatabaseHelper.hasCoopItem(
-            databaseLogic,
             databaseState,
             'newGeneral',
             'doNotHaveItem',
@@ -394,7 +384,6 @@ describe('DatabaseHelper', () => {
           };
 
           expect(DatabaseHelper.hasCoopItem(
-            databaseLogic,
             databaseState,
             'newGeneral',
             'doNotHaveItem',
@@ -418,7 +407,6 @@ describe('DatabaseHelper', () => {
         };
 
         expect(DatabaseHelper.hasCoopItem(
-          databaseLogic,
           databaseState,
           'newGeneral',
           'doNotHaveItem',
@@ -440,7 +428,6 @@ describe('DatabaseHelper', () => {
         };
 
         expect(DatabaseHelper.hasCoopItem(
-          databaseLogic,
           databaseState,
           'newGeneral',
           'doNotHaveItem',
@@ -462,7 +449,6 @@ describe('DatabaseHelper', () => {
         };
 
         expect(DatabaseHelper.hasCoopItem(
-          databaseLogic,
           databaseState,
           'newGeneral',
           'doNotHaveItem',

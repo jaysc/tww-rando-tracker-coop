@@ -2,7 +2,7 @@
 
 import _ from "lodash";
 import DatabaseHelper from "./database-helper";
-import DatabaseLogic, { EntrancePayload, IslandsForChartPayload, ItemPayload, LocationPayload, OnJoinedRoom } from "./database-logic";
+import { EntrancePayload, IslandsForChartPayload, ItemPayload, LocationPayload, OnJoinedRoom } from "./database-logic";
 
 export type IslandsForCharts = Record<string, Record<string, IslandsForChartsValue>>;
 export type IslandsForChartsValue = {

@@ -9,11 +9,11 @@ export default class DatabaseHelper {
     return `${generalLocation}#${detailedLocation}`;
   }
 
-  public static getMaxCount(databaseLogic: DatabaseLogic, databaseState: DatabaseState, itemName: string) {
+  public static getMaxCount(databaseState: DatabaseState, itemName: string) {
     return _.reduce(
       _.get(databaseState.items, itemName),
       (acc, value, userId) => {
-        if (databaseLogic.effectiveUserId !== userId) {
+        if (DatabaseLogic.effectiveUserId !== userId) {
           return value.count > acc ? value.count : acc;
         }
         return acc;
@@ -22,13 +22,13 @@ export default class DatabaseHelper {
     );
   }
 
-  public static getLocationsForItem(databaseLogic: DatabaseLogic, databaseState: DatabaseState, itemName: string) {
+  public static getLocationsForItem(databaseState: DatabaseState, itemName: string) {
     return _.reduce(
       databaseState.itemsForLocations,
       (acc, data, location) => {
         const [generalLocation, detailedLocation] = location.split('#');
         _.forEach(data, (itemData: { itemName: string }, userId: string) => {
-          if (databaseLogic.effectiveUserId !== userId) {
+          if (DatabaseLogic.effectiveUserId !== userId) {
             const { itemName: databaseItemName } = itemData;
             if (itemName === databaseItemName) {
               acc.push({
@@ -45,15 +45,15 @@ export default class DatabaseHelper {
     );
   }
 
-  public static getItemForLocation = (databaseLogic: DatabaseLogic
-    , databaseState: DatabaseState
+  public static getItemForLocation = (
+    databaseState: DatabaseState
     , generalLocation: string
     , detailedLocation: string
   ) => {
     return _.reduce(
       _.get(databaseState, ['itemsForLocations', DatabaseHelper.getLocationKey(generalLocation, detailedLocation)]),
       (acc, itemData, userId) => {
-        if (databaseLogic.effectiveUserId !== userId) {
+        if (DatabaseLogic.effectiveUserId !== userId) {
           const { itemName } = itemData;
           if (!acc.includes(itemName)) {
             acc.push(itemName);
@@ -70,8 +70,8 @@ export default class DatabaseHelper {
     return /Compass|(Dungeon Map)/.test(item)
   }
 
-  public static hasCoopItem(databaseLogic: DatabaseLogic
-    , databaseState: DatabaseState
+  public static hasCoopItem(
+    databaseState: DatabaseState
     , generalLocation: string
     , detailedLocation: string
     , disableLogic: boolean): boolean {
@@ -79,7 +79,7 @@ export default class DatabaseHelper {
     const isTriforceCharts = Settings.getOptionValue(Permalink.OPTIONS.PROGRESSION_TRIFORCE_CHARTS)
     const isMisc = Settings.getOptionValue(Permalink.OPTIONS.PROGRESSION_MISC)
 
-    const result = this.getItemForLocation(databaseLogic, databaseState, generalLocation, detailedLocation);
+    const result = this.getItemForLocation(databaseState, generalLocation, detailedLocation);
     
     if (!_.isNil(disableLogic)) {
       return result.length > 0;

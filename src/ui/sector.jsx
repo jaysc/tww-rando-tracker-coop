@@ -17,7 +17,6 @@ import KeyDownWrapper from './key-down-wrapper';
 class Sector extends React.PureComponent {
   chestsCounter() {
     const {
-      databaseLogic,
       databaseState,
       disableLogic,
       island,
@@ -34,7 +33,6 @@ class Sector extends React.PureComponent {
       isDungeon: false,
       onlyProgressLocations,
       disableLogic,
-      databaseLogic,
       databaseState,
       hideCoopItemLocations,
     });
@@ -52,7 +50,6 @@ class Sector extends React.PureComponent {
   chartItem() {
     const {
       clearSelectedItem,
-      databaseLogic,
       databaseState,
       decrementItem,
       incrementItem,
@@ -71,13 +68,11 @@ class Sector extends React.PureComponent {
     const chartCount = trackerState.getItemValue(chartName);
 
     const databaseMaxCount = DatabaseHelper.getMaxCount(
-      databaseLogic,
       databaseState,
       chartName,
     );
 
     const databaseLocations = DatabaseHelper.getLocationsForItem(
-      databaseLogic,
       databaseState,
       chartName,
     );
@@ -112,7 +107,6 @@ class Sector extends React.PureComponent {
     const {
       clearSelectedChartForIsland,
       clearSelectedLocation,
-      databaseLogic,
       databaseState,
       island,
       setSelectedChartForIsland,
@@ -130,7 +124,6 @@ class Sector extends React.PureComponent {
     const chartImages = _.get(Images.IMAGES, ['CHARTS', 'Treasure']);
 
     const databaseMaxCount = DatabaseHelper.getMaxCount(
-      databaseLogic,
       databaseState,
       chartForIsland,
     );
@@ -140,7 +133,6 @@ class Sector extends React.PureComponent {
     let databaseLocations = [];
     if (!_.isNil(chartItem)) {
       databaseLocations = DatabaseHelper.getLocationsForItem(
-        databaseLogic,
         databaseState,
         chartItem,
       );
@@ -298,7 +290,6 @@ Sector.propTypes = {
   clearSelectedChartForIsland: PropTypes.func.isRequired,
   clearSelectedItem: PropTypes.func.isRequired,
   clearSelectedLocation: PropTypes.func.isRequired,
-  databaseLogic: PropTypes.instanceOf(DatabaseLogic).isRequired,
   databaseState: PropTypes.instanceOf(DatabaseState).isRequired,
   decrementItem: PropTypes.func.isRequired,
   disableLogic: PropTypes.bool.isRequired,
