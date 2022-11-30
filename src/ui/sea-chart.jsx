@@ -20,6 +20,7 @@ class SeaChart extends React.PureComponent {
       databaseState,
       decrementItem,
       disableLogic,
+      hideCoopItemLocations,
       incrementItem,
       logic,
       onlyProgressLocations,
@@ -27,7 +28,7 @@ class SeaChart extends React.PureComponent {
       setSelectedExit,
       setSelectedItem,
       setSelectedLocation,
-      hideCoopItemLocations,
+      showCoopItemSettings,
       spheres,
       trackerState,
       trackSpheres,
@@ -46,6 +47,7 @@ class SeaChart extends React.PureComponent {
         databaseState={databaseState}
         decrementItem={decrementItem}
         disableLogic={disableLogic}
+        hideCoopItemLocations={hideCoopItemLocations}
         key={island}
         incrementItem={incrementItem}
         island={island}
@@ -55,7 +57,7 @@ class SeaChart extends React.PureComponent {
         setSelectedExit={setSelectedExit}
         setSelectedItem={setSelectedItem}
         setSelectedLocation={setSelectedLocation}
-        hideCoopItemLocations={hideCoopItemLocations}
+        showCoopItemSettings={showCoopItemSettings}
         spheres={spheres}
         trackerState={trackerState}
         trackSpheres={trackSpheres}
@@ -91,6 +93,7 @@ SeaChart.propTypes = {
   databaseState: PropTypes.instanceOf(DatabaseState).isRequired,
   decrementItem: PropTypes.func.isRequired,
   disableLogic: PropTypes.bool.isRequired,
+  hideCoopItemLocations: PropTypes.bool.isRequired,
   incrementItem: PropTypes.func.isRequired,
   logic: PropTypes.instanceOf(LogicCalculation).isRequired,
   onlyProgressLocations: PropTypes.bool.isRequired,
@@ -98,7 +101,9 @@ SeaChart.propTypes = {
   setSelectedExit: PropTypes.func.isRequired,
   setSelectedItem: PropTypes.func.isRequired,
   setSelectedLocation: PropTypes.func.isRequired,
-  hideCoopItemLocations: PropTypes.bool.isRequired,
+  showCoopItemSettings: PropTypes.shape({
+    charts: PropTypes.bool.isRequired,
+  }).isRequired,
   spheres: PropTypes.instanceOf(Spheres).isRequired,
   trackerState: PropTypes.instanceOf(TrackerState).isRequired,
   trackSpheres: PropTypes.bool.isRequired,

@@ -4,6 +4,10 @@ import DatabaseState from "./database-state";
 import Permalink from "./permalink";
 import Settings from "./settings";
 
+interface CoopItemSettings {
+  charts: boolean
+}
+
 export default class DatabaseHelper {
   public static getLocationKey(generalLocation, detailedLocation) {
     return `${generalLocation}#${detailedLocation}`;
@@ -70,35 +74,49 @@ export default class DatabaseHelper {
     return /Compass|(Dungeon Map)/.test(item)
   }
 
+  // to be expanded with other items
+  private static checkCoopItemSettings(coopItemSettings: CoopItemSettings, itemName: string): boolean {
+    if (!coopItemSettings.charts && /(Treasure|Triforce) Chart/.test(itemName)) {
+      return false;
+    }
+
+    return true;
+  }
+
   public static hasCoopItem(
     databaseState: DatabaseState
     , generalLocation: string
     , detailedLocation: string
-    , disableLogic: boolean): boolean {
+    , {
+      disableLogic
+      , showCoopItemSettings
+    }: { disableLogic: boolean, showCoopItemSettings: CoopItemSettings }): boolean {
     const isCharts = Settings.getOptionValue(Permalink.OPTIONS.PROGRESSION_TREASURE_CHARTS);
     const isTriforceCharts = Settings.getOptionValue(Permalink.OPTIONS.PROGRESSION_TRIFORCE_CHARTS)
     const isMisc = Settings.getOptionValue(Permalink.OPTIONS.PROGRESSION_MISC)
 
     const result = this.getItemForLocation(databaseState, generalLocation, detailedLocation);
-    
-    if (!_.isNil(disableLogic)) {
+
+    if (disableLogic) {
       return result.length > 0;
     } else {
       return _.reduce(result, (acc, itemName) => {
-        if (itemName.includes('Treasure Chart')) {
-          if (isCharts){
+        if (this.checkCoopItemSettings(showCoopItemSettings, itemName)) {
+            if (/Treasure Chart/.test(itemName)) {
+            if (isCharts) {
+              acc += 1;
+            }
+          } else if (/Triforce Chart/.test(itemName)) {
+            if (isTriforceCharts) {
+              acc += 1;
+            }
+          } else if (itemName.includes('Tingle Statue')) {
+            if (isMisc) {
+              acc += 1;
+            }
+          } else if (!this.isIgnoredItem(itemName)) {
             acc += 1;
           }
-        } else if (itemName.includes('Triforce Chart')) {
-          if (isTriforceCharts) {
-            acc += 1;
-          }
-        } else if (itemName.includes('Tingle Statue')) {
-          if (isMisc) {
-            acc += 1;
-          }
-        } else if (!this.isIgnoredItem(itemName)) {
-          acc += 1;
         }
 
         return acc;

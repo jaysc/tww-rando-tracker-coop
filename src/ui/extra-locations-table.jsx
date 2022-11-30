@@ -24,6 +24,7 @@ class ExtraLocationsTable extends React.PureComponent {
       setSelectedExit,
       setSelectedItem,
       setSelectedLocation,
+      showCoopItemSettings,
       spheres,
       trackerState,
       trackSpheres,
@@ -51,6 +52,7 @@ class ExtraLocationsTable extends React.PureComponent {
         setSelectedExit={setSelectedExit}
         setSelectedItem={setSelectedItem}
         setSelectedLocation={setSelectedLocation}
+        showCoopItemSettings={showCoopItemSettings}
         spheres={spheres}
         trackerState={trackerState}
         trackSpheres={trackSpheres}
@@ -102,6 +104,9 @@ ExtraLocationsTable.propTypes = {
   setSelectedExit: PropTypes.func.isRequired,
   setSelectedItem: PropTypes.func.isRequired,
   setSelectedLocation: PropTypes.func.isRequired,
+  showCoopItemSettings: PropTypes.shape({
+    charts: PropTypes.bool.isRequired,
+  }).isRequired,
   spheres: PropTypes.instanceOf(Spheres).isRequired,
   trackerState: PropTypes.instanceOf(TrackerState).isRequired,
   trackSpheres: PropTypes.bool.isRequired,

@@ -47,6 +47,9 @@ class Tracker extends React.PureComponent {
       openedLocation: null,
       openedLocationIsDungeon: null,
       hideCoopItemLocations: false,
+      showCoopItemSettings: {
+        charts: true,
+      },
       trackSpheres: true,
     };
 
@@ -57,7 +60,8 @@ class Tracker extends React.PureComponent {
     this.decrementItem = this.decrementItem.bind(this);
     this.incrementItem = this.incrementItem.bind(this);
     this.toggleChartList = this.toggleChartList.bind(this);
-    this.toggleCoopLocations = this.toggleCoopLocations.bind(this);
+    this.toggleCoopItemLocations = this.toggleCoopItemLocations.bind(this);
+    this.toggleCoopMiscItemLocations = this.toggleCoopMiscItemLocations.bind(this);
     this.toggleColorPicker = this.toggleColorPicker.bind(this);
     this.toggleDisableLogic = this.toggleDisableLogic.bind(this);
     this.toggleEntrancesList = this.toggleEntrancesList.bind(this);
@@ -809,11 +813,25 @@ class Tracker extends React.PureComponent {
     this.updatePreferences({ trackSpheres: !trackSpheres });
   }
 
-  toggleCoopLocations() {
+  toggleCoopItemLocations() {
     const { hideCoopItemLocations } = this.state;
 
     this.setState({
       hideCoopItemLocations: !hideCoopItemLocations,
+    });
+  }
+
+  toggleCoopMiscItemLocations() {
+    const { showCoopItemSettings } = this.state;
+
+    const newShowCoopItemSettings = _.merge(
+      {},
+      showCoopItemSettings,
+      { charts: !showCoopItemSettings.charts },
+    );
+
+    this.setState({
+      showCoopItemSettings: newShowCoopItemSettings,
     });
   }
 
@@ -865,6 +883,7 @@ class Tracker extends React.PureComponent {
       openedLocationIsDungeon,
       saveData,
       hideCoopItemLocations,
+      showCoopItemSettings,
       spheres,
       trackerState,
       trackSpheres,
@@ -916,6 +935,7 @@ class Tracker extends React.PureComponent {
               openedLocation={openedLocation}
               openedLocationIsDungeon={openedLocationIsDungeon}
               hideCoopItemLocations={hideCoopItemLocations}
+              showCoopItemSettings={showCoopItemSettings}
               spheres={spheres}
               toggleLocationChecked={this.toggleLocationChecked}
               trackerState={trackerState}
@@ -965,10 +985,12 @@ class Tracker extends React.PureComponent {
             onlyProgressLocations={onlyProgressLocations}
             saveData={saveData}
             hideCoopItemLocations={hideCoopItemLocations}
+            hideCoopMiscItemLocations={showCoopItemSettings.charts}
             trackSpheres={trackSpheres}
             toggleChartList={this.toggleChartList}
             toggleColorPicker={this.toggleColorPicker}
-            toggleCoopLocations={this.toggleCoopLocations}
+            toggleCoopItemLocations={this.toggleCoopItemLocations}
+            toggleCoopMiscItemLocations={this.toggleCoopMiscItemLocations}
             toggleDisableLogic={this.toggleDisableLogic}
             toggleEntrancesList={this.toggleEntrancesList}
             toggleOnlyProgressLocations={this.toggleOnlyProgressLocations}

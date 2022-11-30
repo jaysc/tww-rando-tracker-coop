@@ -223,6 +223,7 @@ class DetailedLocationsTable extends React.PureComponent {
       onlyProgressLocations,
       openedLocation,
       openedLocationIsDungeon,
+      showCoopItemSettings,
     } = this.props;
 
     const backgroundImage = _.get(Images.IMAGES, [
@@ -237,6 +238,7 @@ class DetailedLocationsTable extends React.PureComponent {
         disableLogic,
         isDungeon: openedLocationIsDungeon,
         onlyProgressLocations,
+        showCoopItemSettings,
       },
     );
 
@@ -293,6 +295,9 @@ DetailedLocationsTable.propTypes = {
   onlyProgressLocations: PropTypes.bool.isRequired,
   openedLocation: PropTypes.string.isRequired,
   openedLocationIsDungeon: PropTypes.bool.isRequired,
+  showCoopItemSettings: PropTypes.shape({
+    charts: PropTypes.bool.isRequired,
+  }).isRequired,
   spheres: PropTypes.instanceOf(Spheres).isRequired,
   trackerState: PropTypes.instanceOf(TrackerState).isRequired,
   trackSpheres: PropTypes.bool.isRequired,

@@ -26,10 +26,12 @@ class Buttons extends React.PureComponent {
       entrancesListOpen,
       onlyProgressLocations,
       hideCoopItemLocations,
+      hideCoopMiscItemLocations,
       trackSpheres,
       toggleChartList,
       toggleColorPicker,
-      toggleCoopLocations,
+      toggleCoopItemLocations,
+      toggleCoopMiscItemLocations,
       toggleDisableLogic,
       toggleEntrancesList,
       toggleOnlyProgressLocations,
@@ -92,11 +94,18 @@ class Buttons extends React.PureComponent {
           Track Spheres
         </button>
         <button
-          onClick={toggleCoopLocations}
+          onClick={toggleCoopItemLocations}
           type="button"
         >
           <input type="checkbox" className="button-checkbox" checked={hideCoopItemLocations} readOnly />
           Hide Coop Item Locations from Count
+        </button>
+        <button
+          onClick={toggleCoopMiscItemLocations}
+          type="button"
+        >
+          <input type="checkbox" className="button-checkbox" checked={!hideCoopMiscItemLocations} readOnly />
+          Hide Coop Charts
         </button>
         <button
           onClick={toggleColorPicker}
@@ -117,10 +126,12 @@ Buttons.propTypes = {
   onlyProgressLocations: PropTypes.bool.isRequired,
   saveData: PropTypes.string.isRequired,
   hideCoopItemLocations: PropTypes.bool.isRequired,
+  hideCoopMiscItemLocations: PropTypes.bool.isRequired,
   trackSpheres: PropTypes.bool.isRequired,
   toggleChartList: PropTypes.func.isRequired,
   toggleColorPicker: PropTypes.func.isRequired,
-  toggleCoopLocations: PropTypes.func.isRequired,
+  toggleCoopItemLocations: PropTypes.func.isRequired,
+  toggleCoopMiscItemLocations: PropTypes.func.isRequired,
   toggleDisableLogic: PropTypes.func.isRequired,
   toggleEntrancesList: PropTypes.func.isRequired,
   toggleOnlyProgressLocations: PropTypes.func.isRequired,

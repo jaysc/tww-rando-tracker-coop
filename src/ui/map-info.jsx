@@ -17,6 +17,7 @@ class MapInfo extends React.PureComponent {
       onlyProgressLocations,
       selectedLocation,
       selectedLocationIsDungeon,
+      showCoopItemSettings,
     } = this.props;
 
     if (_.isNil(selectedLocation)) {
@@ -32,6 +33,7 @@ class MapInfo extends React.PureComponent {
       disableLogic,
       databaseState,
       hideCoopItemLocations,
+      showCoopItemSettings,
     });
 
     return (
@@ -124,6 +126,9 @@ MapInfo.propTypes = {
   selectedItem: PropTypes.string,
   selectedLocation: PropTypes.string,
   selectedLocationIsDungeon: PropTypes.bool,
+  showCoopItemSettings: PropTypes.shape({
+    charts: PropTypes.bool.isRequired,
+  }).isRequired,
   trackerState: PropTypes.instanceOf(TrackerState).isRequired,
 };
 

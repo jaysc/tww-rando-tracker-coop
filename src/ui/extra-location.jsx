@@ -284,6 +284,7 @@ class ExtraLocation extends React.PureComponent {
       locationName,
       logic,
       onlyProgressLocations,
+      showCoopItemSettings,
     } = this.props;
 
     const {
@@ -296,6 +297,7 @@ class ExtraLocation extends React.PureComponent {
       disableLogic,
       databaseState,
       hideCoopItemLocations,
+      showCoopItemSettings,
     });
 
     const className = `extra-location-chests ${color}`;
@@ -362,6 +364,9 @@ ExtraLocation.propTypes = {
   setSelectedExit: PropTypes.func.isRequired,
   setSelectedItem: PropTypes.func.isRequired,
   setSelectedLocation: PropTypes.func.isRequired,
+  showCoopItemSettings: PropTypes.shape({
+    charts: PropTypes.bool.isRequired,
+  }).isRequired,
   spheres: PropTypes.instanceOf(Spheres).isRequired,
   trackerState: PropTypes.instanceOf(TrackerState).isRequired,
   trackSpheres: PropTypes.bool.isRequired,

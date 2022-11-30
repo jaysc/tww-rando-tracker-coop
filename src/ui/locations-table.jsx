@@ -89,6 +89,7 @@ class LocationsTable extends React.PureComponent {
       openedLocation,
       openedLocationIsDungeon,
       hideCoopItemLocations,
+      showCoopItemSettings,
       spheres,
       toggleLocationChecked,
       trackerState,
@@ -156,6 +157,7 @@ class LocationsTable extends React.PureComponent {
           onlyProgressLocations={onlyProgressLocations}
           openedLocation={openedLocation}
           openedLocationIsDungeon={openedLocationIsDungeon}
+          showCoopItemSettings={showCoopItemSettings}
           spheres={spheres}
           trackerState={trackerState}
           trackSpheres={trackSpheres}
@@ -179,6 +181,7 @@ class LocationsTable extends React.PureComponent {
           setSelectedItem={this.setSelectedItem}
           setSelectedLocation={this.setSelectedLocation}
           hideCoopItemLocations={hideCoopItemLocations}
+          showCoopItemSettings={showCoopItemSettings}
           spheres={spheres}
           trackerState={trackerState}
           trackSpheres={trackSpheres}
@@ -205,6 +208,7 @@ class LocationsTable extends React.PureComponent {
           selectedItem={selectedItem}
           selectedLocation={selectedLocation}
           selectedLocationIsDungeon={selectedLocationIsDungeon}
+          showCoopItemSettings={showCoopItemSettings}
           trackerState={trackerState}
         />
       </div>
@@ -221,6 +225,7 @@ class LocationsTable extends React.PureComponent {
       incrementItem,
       logic,
       onlyProgressLocations,
+      showCoopItemSettings,
       spheres,
       trackerState,
       trackSpheres,
@@ -246,6 +251,7 @@ class LocationsTable extends React.PureComponent {
           setSelectedExit={this.setSelectedExit}
           setSelectedItem={this.setSelectedItem}
           setSelectedLocation={this.setSelectedLocation}
+          showCoopItemSettings={showCoopItemSettings}
           spheres={spheres}
           trackerState={trackerState}
           trackSpheres={trackSpheres}
@@ -275,6 +281,7 @@ LocationsTable.propTypes = {
   decrementItem: PropTypes.func.isRequired,
   disableLogic: PropTypes.bool.isRequired,
   entrancesListOpen: PropTypes.bool.isRequired,
+  hideCoopItemLocations: PropTypes.bool.isRequired,
   incrementItem: PropTypes.func.isRequired,
   logic: PropTypes.instanceOf(LogicCalculation).isRequired,
   onlyProgressLocations: PropTypes.bool.isRequired,
@@ -282,7 +289,9 @@ LocationsTable.propTypes = {
   openedExit: PropTypes.string,
   openedLocation: PropTypes.string,
   openedLocationIsDungeon: PropTypes.bool,
-  hideCoopItemLocations: PropTypes.bool.isRequired,
+  showCoopItemSettings: PropTypes.shape({
+    charts: PropTypes.bool.isRequired,
+  }).isRequired,
   spheres: PropTypes.instanceOf(Spheres).isRequired,
   toggleLocationChecked: PropTypes.func.isRequired,
   trackerState: PropTypes.instanceOf(TrackerState).isRequired,
