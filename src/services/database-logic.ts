@@ -523,10 +523,6 @@ class DatabaseLogic {
       return;
     }
 
-    if (responseData.message) {
-      console.log(responseData.message);
-    }
-
     const event = responseData.event;
 
     switch (event) {
