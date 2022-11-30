@@ -17,6 +17,7 @@ class ExtraLocationsTable extends React.PureComponent {
       databaseState,
       decrementItem,
       disableLogic,
+      hideCoopItemLocations,
       incrementItem,
       logic,
       onlyProgressLocations,
@@ -40,6 +41,7 @@ class ExtraLocationsTable extends React.PureComponent {
         databaseState={databaseState}
         decrementItem={decrementItem}
         disableLogic={disableLogic}
+        hideCoopItemLocations={hideCoopItemLocations}
         key={locationName}
         incrementItem={incrementItem}
         isDungeon={isDungeon}
@@ -93,6 +95,7 @@ ExtraLocationsTable.propTypes = {
   databaseState: PropTypes.instanceOf(DatabaseState).isRequired,
   decrementItem: PropTypes.func.isRequired,
   disableLogic: PropTypes.bool.isRequired,
+  hideCoopItemLocations: PropTypes.bool.isRequired,
   incrementItem: PropTypes.func.isRequired,
   logic: PropTypes.instanceOf(LogicCalculation).isRequired,
   onlyProgressLocations: PropTypes.bool.isRequired,

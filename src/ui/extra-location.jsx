@@ -279,6 +279,7 @@ class ExtraLocation extends React.PureComponent {
     const {
       databaseState,
       disableLogic,
+      hideCoopItemLocations,
       isDungeon,
       locationName,
       logic,
@@ -294,6 +295,7 @@ class ExtraLocation extends React.PureComponent {
       onlyProgressLocations,
       disableLogic,
       databaseState,
+      hideCoopItemLocations,
     });
 
     const className = `extra-location-chests ${color}`;
@@ -351,6 +353,7 @@ ExtraLocation.propTypes = {
   databaseState: PropTypes.instanceOf(DatabaseState).isRequired,
   decrementItem: PropTypes.func.isRequired,
   disableLogic: PropTypes.bool.isRequired,
+  hideCoopItemLocations: PropTypes.bool.isRequired,
   incrementItem: PropTypes.func.isRequired,
   isDungeon: PropTypes.bool.isRequired,
   locationName: PropTypes.string.isRequired,

@@ -197,6 +197,7 @@ class LocationsTable extends React.PureComponent {
         <MapInfo
           disableLogic={disableLogic}
           databaseState={databaseState}
+          hideCoopItemLocations={hideCoopItemLocations}
           logic={logic}
           onlyProgressLocations={onlyProgressLocations}
           selectedChartForIsland={selectedChartForIsland}
@@ -216,6 +217,7 @@ class LocationsTable extends React.PureComponent {
       databaseState,
       decrementItem,
       disableLogic,
+      hideCoopItemLocations,
       incrementItem,
       logic,
       onlyProgressLocations,
@@ -237,6 +239,7 @@ class LocationsTable extends React.PureComponent {
           databaseState={databaseState}
           decrementItem={decrementItem}
           disableLogic={disableLogic}
+          hideCoopItemLocations={hideCoopItemLocations}
           incrementItem={incrementItem}
           logic={logic}
           onlyProgressLocations={onlyProgressLocations}

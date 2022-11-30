@@ -12,6 +12,7 @@ class MapInfo extends React.PureComponent {
     const {
       databaseState,
       disableLogic,
+      hideCoopItemLocations,
       logic,
       onlyProgressLocations,
       selectedLocation,
@@ -30,6 +31,7 @@ class MapInfo extends React.PureComponent {
       onlyProgressLocations,
       disableLogic,
       databaseState,
+      hideCoopItemLocations,
     });
 
     return (
@@ -114,6 +116,7 @@ MapInfo.defaultProps = {
 MapInfo.propTypes = {
   databaseState: PropTypes.instanceOf(DatabaseState).isRequired,
   disableLogic: PropTypes.bool.isRequired,
+  hideCoopItemLocations: PropTypes.bool.isRequired,
   logic: PropTypes.instanceOf(LogicCalculation).isRequired,
   onlyProgressLocations: PropTypes.bool.isRequired,
   selectedChartForIsland: PropTypes.string,
