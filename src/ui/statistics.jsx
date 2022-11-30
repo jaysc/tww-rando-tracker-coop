@@ -1,12 +1,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import DatabaseHelper from '../services/database-helper';
+import DatabaseState from '../services/database-state.ts';
 import LogicCalculation from '../services/logic-calculation';
 
 class Statistics extends React.PureComponent {
   render() {
     const {
       backgroundColor,
+      databaseState,
       disableLogic,
       logic,
       onlyProgressLocations,
@@ -37,6 +40,10 @@ class Statistics extends React.PureComponent {
         </table>
         <table className="right-table">
           <tbody>
+            <tr>
+              <td>{DatabaseHelper.numOfCheckedLocations(databaseState)}</td>
+              <td>Coop Locations Checked</td>
+            </tr>
             {!disableLogic && (
               <tr>
                 <td>{logic.itemsNeededToFinishGame()}</td>
@@ -62,6 +69,7 @@ Statistics.defaultProps = {
 
 Statistics.propTypes = {
   backgroundColor: PropTypes.string,
+  databaseState: PropTypes.instanceOf(DatabaseState).isRequired,
   disableLogic: PropTypes.bool.isRequired,
   logic: PropTypes.instanceOf(LogicCalculation).isRequired,
   onlyProgressLocations: PropTypes.bool.isRequired,

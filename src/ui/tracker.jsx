@@ -930,6 +930,7 @@ class Tracker extends React.PureComponent {
             />
             <Statistics
               backgroundColor={statisticsBackground}
+              databaseState={databaseState}
               disableLogic={disableLogic}
               logic={logic}
               onlyProgressLocations={onlyProgressLocations}

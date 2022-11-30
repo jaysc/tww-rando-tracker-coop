@@ -115,4 +115,13 @@ export default class DatabaseHelper {
         return !!locationData.isChecked;
       })
   }
+
+  public static numOfCheckedLocations(databaseState: DatabaseState) {
+    return _.reduce(databaseState.locationsChecked, (acc, locationData, location) => {
+      if (_.some(locationData, (userData) => userData.isChecked)) {
+        acc += 1;
+      }
+      return acc;
+    }, 0)
+  }
 }
