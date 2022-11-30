@@ -90,6 +90,7 @@ class LocationsTable extends React.PureComponent {
       openedExit,
       openedLocation,
       openedLocationIsDungeon,
+      hideCoopItemLocations,
       spheres,
       toggleLocationChecked,
       trackerState,
@@ -182,6 +183,7 @@ class LocationsTable extends React.PureComponent {
           setSelectedExit={this.setSelectedExit}
           setSelectedItem={this.setSelectedItem}
           setSelectedLocation={this.setSelectedLocation}
+          hideCoopItemLocations={hideCoopItemLocations}
           spheres={spheres}
           trackerState={trackerState}
           trackSpheres={trackSpheres}
@@ -286,6 +288,7 @@ LocationsTable.propTypes = {
   openedExit: PropTypes.string,
   openedLocation: PropTypes.string,
   openedLocationIsDungeon: PropTypes.bool,
+  hideCoopItemLocations: PropTypes.bool.isRequired,
   spheres: PropTypes.instanceOf(Spheres).isRequired,
   toggleLocationChecked: PropTypes.func.isRequired,
   trackerState: PropTypes.instanceOf(TrackerState).isRequired,

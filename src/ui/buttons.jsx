@@ -25,9 +25,11 @@ class Buttons extends React.PureComponent {
       disableLogic,
       entrancesListOpen,
       onlyProgressLocations,
+      hideCoopItemLocations,
       trackSpheres,
       toggleChartList,
       toggleColorPicker,
+      toggleCoopLocations,
       toggleDisableLogic,
       toggleEntrancesList,
       toggleOnlyProgressLocations,
@@ -90,6 +92,13 @@ class Buttons extends React.PureComponent {
           Track Spheres
         </button>
         <button
+          onClick={toggleCoopLocations}
+          type="button"
+        >
+          <input type="checkbox" className="button-checkbox" checked={hideCoopItemLocations} readOnly />
+          Hide Coop Item Locations from Count
+        </button>
+        <button
           onClick={toggleColorPicker}
           type="button"
         >
@@ -107,9 +116,11 @@ Buttons.propTypes = {
   entrancesListOpen: PropTypes.bool.isRequired,
   onlyProgressLocations: PropTypes.bool.isRequired,
   saveData: PropTypes.string.isRequired,
+  hideCoopItemLocations: PropTypes.bool.isRequired,
   trackSpheres: PropTypes.bool.isRequired,
   toggleChartList: PropTypes.func.isRequired,
   toggleColorPicker: PropTypes.func.isRequired,
+  toggleCoopLocations: PropTypes.func.isRequired,
   toggleDisableLogic: PropTypes.func.isRequired,
   toggleEntrancesList: PropTypes.func.isRequired,
   toggleOnlyProgressLocations: PropTypes.func.isRequired,

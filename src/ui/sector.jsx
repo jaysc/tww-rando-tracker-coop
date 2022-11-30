@@ -23,6 +23,7 @@ class Sector extends React.PureComponent {
       island,
       logic,
       onlyProgressLocations,
+      hideCoopItemLocations,
     } = this.props;
 
     const {
@@ -35,6 +36,7 @@ class Sector extends React.PureComponent {
       disableLogic,
       databaseLogic,
       databaseState,
+      hideCoopItemLocations,
     });
 
     const className = `chests-counter ${color}`;
@@ -308,6 +310,7 @@ Sector.propTypes = {
   setSelectedExit: PropTypes.func.isRequired,
   setSelectedItem: PropTypes.func.isRequired,
   setSelectedLocation: PropTypes.func.isRequired,
+  hideCoopItemLocations: PropTypes.bool.isRequired,
   spheres: PropTypes.instanceOf(Spheres).isRequired,
   trackerState: PropTypes.instanceOf(TrackerState).isRequired,
   trackSpheres: PropTypes.bool.isRequired,

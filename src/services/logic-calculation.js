@@ -65,7 +65,12 @@ class LogicCalculation {
   }
 
   locationCounts(generalLocation, {
-    isDungeon, onlyProgressLocations, disableLogic, databaseLogic, databaseState,
+    isDungeon,
+    onlyProgressLocations,
+    disableLogic,
+    databaseLogic,
+    databaseState,
+    hideCoopItemLocations,
   }) {
     const detailedLocations = LogicHelper.filterDetailedLocations(
       generalLocation,
@@ -93,7 +98,7 @@ class LogicCalculation {
 
       if (
         !this.state.isLocationChecked(generalLocation, detailedLocation)
-        && (!isLocationCoopChecked || hasCoopItem)) {
+        && ((!isLocationCoopChecked || (hasCoopItem && !hideCoopItemLocations)))) {
         if (disableLogic
           || this.isLocationAvailable(generalLocation, detailedLocation)) {
           numAvailable += 1;

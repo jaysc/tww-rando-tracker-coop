@@ -29,6 +29,7 @@ class SeaChart extends React.PureComponent {
       setSelectedExit,
       setSelectedItem,
       setSelectedLocation,
+      hideCoopItemLocations,
       spheres,
       trackerState,
       trackSpheres,
@@ -57,6 +58,7 @@ class SeaChart extends React.PureComponent {
         setSelectedExit={setSelectedExit}
         setSelectedItem={setSelectedItem}
         setSelectedLocation={setSelectedLocation}
+        hideCoopItemLocations={hideCoopItemLocations}
         spheres={spheres}
         trackerState={trackerState}
         trackSpheres={trackSpheres}
@@ -100,6 +102,7 @@ SeaChart.propTypes = {
   setSelectedExit: PropTypes.func.isRequired,
   setSelectedItem: PropTypes.func.isRequired,
   setSelectedLocation: PropTypes.func.isRequired,
+  hideCoopItemLocations: PropTypes.bool.isRequired,
   spheres: PropTypes.instanceOf(Spheres).isRequired,
   trackerState: PropTypes.instanceOf(TrackerState).isRequired,
   trackSpheres: PropTypes.bool.isRequired,

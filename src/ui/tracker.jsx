@@ -46,6 +46,7 @@ class Tracker extends React.PureComponent {
       openedExit: null,
       openedLocation: null,
       openedLocationIsDungeon: null,
+      hideCoopItemLocations: false,
       trackSpheres: true,
     };
 
@@ -56,6 +57,7 @@ class Tracker extends React.PureComponent {
     this.decrementItem = this.decrementItem.bind(this);
     this.incrementItem = this.incrementItem.bind(this);
     this.toggleChartList = this.toggleChartList.bind(this);
+    this.toggleCoopLocations = this.toggleCoopLocations.bind(this);
     this.toggleColorPicker = this.toggleColorPicker.bind(this);
     this.toggleDisableLogic = this.toggleDisableLogic.bind(this);
     this.toggleEntrancesList = this.toggleEntrancesList.bind(this);
@@ -816,6 +818,14 @@ class Tracker extends React.PureComponent {
     this.updatePreferences({ trackSpheres: !trackSpheres });
   }
 
+  toggleCoopLocations() {
+    const { hideCoopItemLocations } = this.state;
+
+    this.setState({
+      hideCoopItemLocations: !hideCoopItemLocations,
+    });
+  }
+
   unsetLastLocation() {
     this.setState({ lastLocation: null });
   }
@@ -864,6 +874,7 @@ class Tracker extends React.PureComponent {
       openedLocation,
       openedLocationIsDungeon,
       saveData,
+      hideCoopItemLocations,
       spheres,
       trackerState,
       trackSpheres,
@@ -916,6 +927,7 @@ class Tracker extends React.PureComponent {
               openedExit={openedExit}
               openedLocation={openedLocation}
               openedLocationIsDungeon={openedLocationIsDungeon}
+              hideCoopItemLocations={hideCoopItemLocations}
               spheres={spheres}
               toggleLocationChecked={this.toggleLocationChecked}
               trackerState={trackerState}
@@ -1005,9 +1017,11 @@ class Tracker extends React.PureComponent {
             entrancesListOpen={entrancesListOpen}
             onlyProgressLocations={onlyProgressLocations}
             saveData={saveData}
+            hideCoopItemLocations={hideCoopItemLocations}
             trackSpheres={trackSpheres}
             toggleChartList={this.toggleChartList}
             toggleColorPicker={this.toggleColorPicker}
+            toggleCoopLocations={this.toggleCoopLocations}
             toggleDisableLogic={this.toggleDisableLogic}
             toggleEntrancesList={this.toggleEntrancesList}
             toggleOnlyProgressLocations={this.toggleOnlyProgressLocations}
