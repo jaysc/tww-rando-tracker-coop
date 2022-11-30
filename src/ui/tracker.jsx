@@ -11,6 +11,7 @@ import TrackerController from '../services/tracker-controller';
 
 import Buttons from './buttons';
 import ColorPickerWindow from './color-picker-window';
+import CoopStatus from './coop-status';
 import Images from './images';
 import ItemsTable from './items-table';
 import LocationsTable from './locations-table';
@@ -18,7 +19,6 @@ import SphereTracking from './sphere-tracking';
 import Statistics from './statistics';
 import Storage from './storage';
 import 'react-toastify/dist/ReactToastify.css';
-import Tooltip from './tooltip';
 
 class Tracker extends React.PureComponent {
   constructor(props) {
@@ -953,51 +953,9 @@ class Tracker extends React.PureComponent {
               updateColors={this.updateColors}
             />
           )}
-          <div className="coop-status-box">
-            <div className="coop-status">
-              Server status:&nbsp;
-              {databaseStats.connected ? <div className="connected">Connected</div>
-                : <div className="disconnected">Disconnected </div>}
-            </div>
-            <div className="coop-status">
-              Username:&nbsp;
-              <input
-                type="text"
-                key={Math.random()}
-                onBlur={this.databaseUpdateUsername}
-                defaultValue={_.get(databaseStats.users, DatabaseLogic.userId, '')}
-              />
-            </div>
-            <div className="coop-status">
-              Number of users:&nbsp;
-              <div className="connected">
-                <Tooltip tooltipContent={_.size(databaseStats.users) > 0
-                  ? (
-                    <div className="tooltip">
-                      <div className="tooltip-title">Connected players</div>
-                      <ul>
-                        {_.map(
-                          databaseStats.users,
-                          (name, userId) => <li key={userId}>{name}</li>,
-                        )}
-                      </ul>
-                    </div>
-
-                  )
-                  : null}
-                >
-                  <>{_.size(databaseStats.users)}</>
-                </Tooltip>
-
-              </div>
-            </div>
-            <div className="coop-status">
-              Mode:&nbsp;
-              <div className="connected">
-                {DatabaseLogic.mode}
-              </div>
-            </div>
-          </div>
+          <CoopStatus
+            databaseStats={databaseStats}
+          />
           <Buttons
             colorPickerOpen={colorPickerOpen}
             disableLogic={disableLogic}
