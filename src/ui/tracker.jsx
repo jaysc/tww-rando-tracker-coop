@@ -976,6 +976,7 @@ class Tracker extends React.PureComponent {
           )}
           <CoopStatus
             databaseStats={databaseStats}
+            databaseUpdateUsername={this.databaseUpdateUsername}
           />
           <Buttons
             colorPickerOpen={colorPickerOpen}

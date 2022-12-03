@@ -8,7 +8,7 @@ import Tooltip from './tooltip';
 
 class CoopStatus extends React.PureComponent {
   render() {
-    const { databaseStats } = this.props;
+    const { databaseStats, databaseUpdateUsername } = this.props;
     return (
       <div className="coop-status-box">
         <div className="coop-status">
@@ -21,7 +21,7 @@ class CoopStatus extends React.PureComponent {
           <input
             type="text"
             key={Math.random()}
-            onBlur={this.databaseUpdateUsername}
+            onBlur={databaseUpdateUsername}
             defaultValue={_.get(databaseStats.users, DatabaseLogic.userId, '')}
           />
         </div>
@@ -64,6 +64,7 @@ CoopStatus.propTypes = {
     connected: PropTypes.bool.isRequired,
     users: PropTypes.objectOf(PropTypes.string),
   }).isRequired,
+  databaseUpdateUsername: PropTypes.func.isRequired,
 };
 
 export default CoopStatus;
