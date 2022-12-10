@@ -113,8 +113,12 @@ class ChartList extends React.PureComponent {
       chartName,
     );
 
-    const chartItem = trackerState.getItemForChart();
-    const databaseChartItems = DatabaseHelper.getItemForLocation(databaseState, mappedIslandForChart, 'Sunken Treasure');
+    const chartItem = trackerState.getItemForChart(chartName);
+    const databaseChartItems = DatabaseHelper.getItemForLocation(
+      databaseState,
+      mappedIslandForChart,
+      LogicHelper.SUNKEN_TREASURE_LOCATION,
+    );
 
     let color;
     if (itemCount === 1) {

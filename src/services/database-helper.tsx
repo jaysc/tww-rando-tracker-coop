@@ -386,12 +386,14 @@ export default class DatabaseHelper {
         }
       });
 
-      databaseChartItemContent = (
-        <>
-          <div className="tooltip-title">Coop item at chart</div>
-          <div>{databaseItemContent}</div>
-        </>
-      );
+      if (databaseItemContent.length > 0) {
+        databaseChartItemContent = (
+          <>
+            <div className="tooltip-title">Coop item at chart</div>
+            <div>{databaseItemContent}</div>
+          </>
+        );
+      }
     }
 
     if (databaseItems) {
