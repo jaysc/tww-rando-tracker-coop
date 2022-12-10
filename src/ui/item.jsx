@@ -2,21 +2,19 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import DatabaseHelper from '../services/database-helper.tsx';
 import LogicHelper from '../services/logic-helper';
-import Spheres from '../services/spheres';
 
 import KeyDownWrapper from './key-down-wrapper';
 import Tooltip from './tooltip';
 
 class Item extends React.PureComponent {
-  item({ databaseContent } = {}) {
+  item() {
     const {
       clearSelectedItem,
-      databaseMaxCount,
       decrementItem,
       images,
       incrementItem,
+      isCoopChecked,
       itemCount,
       itemName,
       setSelectedItem,
@@ -46,11 +44,10 @@ class Item extends React.PureComponent {
     };
 
     const setSelectedItemFunc = () => setSelectedItem(itemName);
-    const hasCoopLocation = itemCount !== maxItemCount
-      && (!_.isNil(databaseContent) || databaseMaxCount > itemCount);
+    const hasCoopLocation = isCoopChecked ? 'coop-item' : '';
     return (
       <div
-        className={`item-container ${hasCoopLocation ? 'coop-item' : ''} ${itemClassName}`}
+        className={`item-container ${hasCoopLocation} ${itemClassName}`}
         onBlur={clearSelectedItem}
         onClick={incrementItemFunc}
         onContextMenu={decrementItemFunc}
@@ -71,48 +68,32 @@ class Item extends React.PureComponent {
   }
 
   render() {
-    const { locations, databaseLocations, spheres } = this.props;
-
-    const { databaseLocationContent, tooltipContent } = DatabaseHelper.tooltipManager({
-      databaseLocations,
-      locations,
-      spheres,
-    });
+    const { tooltipContent } = this.props;
 
     return (
       <Tooltip tooltipContent={tooltipContent}>
-        {this.item({ databaseLocationContent })}
+        {this.item()}
       </Tooltip>
     );
   }
 }
 
 Item.defaultProps = {
-  databaseLocations: [],
-  databaseMaxCount: 0,
   decrementItem: null,
-  locations: [],
-  spheres: null,
+  isCoopChecked: false,
+  tooltipContent: null,
 };
 
 Item.propTypes = {
   clearSelectedItem: PropTypes.func.isRequired,
   decrementItem: PropTypes.func,
-  databaseLocations: PropTypes.arrayOf(PropTypes.exact({
-    generalLocation: PropTypes.string.isRequired,
-    detailedLocation: PropTypes.string.isRequired,
-  })),
-  databaseMaxCount: PropTypes.number,
   images: PropTypes.arrayOf(PropTypes.string).isRequired,
   incrementItem: PropTypes.func.isRequired,
+  isCoopChecked: PropTypes.bool,
   itemCount: PropTypes.number.isRequired,
   itemName: PropTypes.string.isRequired,
-  locations: PropTypes.arrayOf(PropTypes.exact({
-    generalLocation: PropTypes.string.isRequired,
-    detailedLocation: PropTypes.string.isRequired,
-  })),
   setSelectedItem: PropTypes.func.isRequired,
-  spheres: PropTypes.instanceOf(Spheres),
+  tooltipContent: PropTypes.element,
 };
 
 export default Item;

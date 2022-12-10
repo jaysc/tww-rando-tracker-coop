@@ -43,7 +43,7 @@ class DetailedLocationsTable extends React.PureComponent {
       itemForLocation,
       requirements,
       trackerState,
-    }).tooltipContent;
+    });
   }
 
   detailedLocation(locationInfo, numColumns) {

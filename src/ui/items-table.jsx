@@ -62,7 +62,6 @@ class ItemsTable extends React.PureComponent {
     const itemCount = trackerState.getItemValue(itemName);
     const itemImages = _.get(Images.IMAGES, ['ITEMS', itemName]);
 
-    const databaseMaxCount = DatabaseHelper.getMaxCount(databaseState, itemName);
     const databaseLocations = DatabaseHelper.getLocationsForItem(
       databaseState,
       itemName,
@@ -73,19 +72,30 @@ class ItemsTable extends React.PureComponent {
       locations = trackerState.getLocationsForItem(itemName);
     }
 
+    const tooltipContent = DatabaseHelper.tooltipManager({
+      databaseLocations,
+      locations,
+      spheres,
+    });
+
+    const isCoopChecked = DatabaseHelper.isCoopChecked(
+      databaseState,
+      locations,
+      itemName,
+      itemCount,
+    );
+
     return (
       <Item
         clearSelectedItem={this.clearSelectedItem}
-        databaseLocations={databaseLocations}
-        databaseMaxCount={databaseMaxCount}
         decrementItem={decrementItem}
         images={itemImages}
         incrementItem={incrementItem}
+        isCoopChecked={isCoopChecked}
         itemCount={itemCount}
         itemName={itemName}
-        locations={locations}
         setSelectedItem={this.setSelectedItem}
-        spheres={spheres}
+        tooltipContent={tooltipContent}
       />
     );
   }

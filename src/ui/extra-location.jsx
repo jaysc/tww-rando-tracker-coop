@@ -110,7 +110,6 @@ class ExtraLocation extends React.PureComponent {
 
     const smallKeyImages = _.get(Images.IMAGES, 'SMALL_KEYS');
 
-    const databaseMaxCount = DatabaseHelper.getMaxCount(databaseState, smallKeyName);
     const databaseLocations = DatabaseHelper.getLocationsForItem(
       databaseState,
       smallKeyName,
@@ -121,20 +120,31 @@ class ExtraLocation extends React.PureComponent {
       locations = trackerState.getLocationsForItem(smallKeyName);
     }
 
+    const tooltipContent = DatabaseHelper.tooltipManager({
+      databaseLocations,
+      locations,
+      spheres,
+    });
+
+    const isCoopChecked = DatabaseHelper.isCoopChecked(
+      databaseState,
+      locations,
+      smallKeyName,
+      smallKeyCount,
+    );
+
     return (
       <div className="dungeon-item small-key">
         <Item
           clearSelectedItem={clearSelectedItem}
-          databaseLocations={databaseLocations}
-          databaseMaxCount={databaseMaxCount}
           decrementItem={decrementItem}
           images={smallKeyImages}
           incrementItem={incrementItem}
+          isCoopChecked={isCoopChecked}
           itemCount={smallKeyCount}
           itemName={smallKeyName}
-          locations={locations}
+          tooltipContent={tooltipContent}
           setSelectedItem={setSelectedItem}
-          spheres={spheres}
         />
       </div>
     );
@@ -156,7 +166,6 @@ class ExtraLocation extends React.PureComponent {
     const bigKeyName = LogicHelper.bigKeyName(locationName);
     const bigKeyCount = trackerState.getItemValue(bigKeyName);
 
-    const databaseMaxCount = DatabaseHelper.getMaxCount(databaseState, bigKeyName);
     const databaseLocations = DatabaseHelper.getLocationsForItem(
       databaseState,
       bigKeyName,
@@ -169,20 +178,31 @@ class ExtraLocation extends React.PureComponent {
       locations = trackerState.getLocationsForItem(bigKeyName);
     }
 
+    const tooltipContent = DatabaseHelper.tooltipManager({
+      databaseLocations,
+      locations,
+      spheres,
+    });
+
+    const isCoopChecked = DatabaseHelper.isCoopChecked(
+      databaseState,
+      locations,
+      bigKeyName,
+      bigKeyCount,
+    );
+
     return (
       <div className="dungeon-item big-key">
         <Item
           clearSelectedItem={clearSelectedItem}
-          databaseLocations={databaseLocations}
-          databaseMaxCount={databaseMaxCount}
           decrementItem={decrementItem}
           images={bigKeyImages}
           incrementItem={incrementItem}
+          isCoopChecked={isCoopChecked}
           itemCount={bigKeyCount}
           itemName={bigKeyName}
-          locations={locations}
           setSelectedItem={setSelectedItem}
-          spheres={spheres}
+          tooltipContent={tooltipContent}
         />
       </div>
     );

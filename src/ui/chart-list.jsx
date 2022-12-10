@@ -158,7 +158,7 @@ class ChartList extends React.PureComponent {
       </div>
     );
 
-    const { tooltipContent } = DatabaseHelper.tooltipManager({
+    const tooltipContent = DatabaseHelper.tooltipManager({
       chartItem,
       databaseChartItems,
       databaseLocations,

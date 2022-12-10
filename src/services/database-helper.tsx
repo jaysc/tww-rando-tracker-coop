@@ -190,13 +190,13 @@ export default class DatabaseHelper {
   public static coopLocationTooltip(
     databaseLocations: { generalLocation: string; detailedLocation: string }[],
     existingLocation: string[],
-    spheres: Spheres
+    spheres?: Spheres
   ) {
     let databaseContent: JSX.Element | null;
     const databaseList: JSX.Element[] = _.reduce(
       databaseLocations,
       (acc, { generalLocation, detailedLocation }) => {
-        const sphere = spheres.sphereForLocation(
+        const sphere = spheres?.sphereForLocation(
           generalLocation,
           detailedLocation
         );
@@ -231,7 +231,7 @@ export default class DatabaseHelper {
   public static locationTooltip(
     locations: { generalLocation: string; detailedLocation: string }[],
     existingLocation: string[],
-    spheres: Spheres
+    spheres?: Spheres
   ) {
     let locationContent: JSX.Element;
     const locationsList = _.map(
@@ -469,10 +469,25 @@ export default class DatabaseHelper {
       );
     }
 
-    return {
-      tooltipContent,
-      databaseLocationContent,
-    };
+    return tooltipContent;
+  }
+
+  /* istanbul ignore next */
+  static isCoopChecked(
+    databaseState: DatabaseState,
+    locations,
+    itemName: string,
+    itemCount: number
+  ) {
+    const databaseMaxCount = this.getMaxCount(databaseState, itemName);
+    const databaseLocations = DatabaseHelper.getLocationsForItem(
+      databaseState,
+      itemName
+    );
+
+    return (
+      databaseMaxCount > itemCount || !_.isEqual(locations, databaseLocations)
+    );
   }
 }
 
