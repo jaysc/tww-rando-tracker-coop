@@ -2,6 +2,8 @@ import _ from 'lodash';
 
 import Locations from './locations';
 import LogicHelper from './logic-helper';
+import Permalink from './permalink';
+import Settings from './settings';
 import TrackerState from './tracker-state';
 
 describe('TrackerState', () => {
@@ -527,6 +529,74 @@ describe('TrackerState', () => {
       const newIslandsForCharts = _.get(newState.islandsForCharts, 'Treasure Chart 10');
 
       expect(newIslandsForCharts).toBe('Outset Island');
+    });
+  });
+
+  describe('getItemForChart', () => {
+    describe('when randomized charts is on', () => {
+      let state;
+
+      beforeAll(() => {
+        state = new TrackerState();
+
+        state.itemsForLocations = {
+          'Windfall Island': {
+            'Sunken Treasure': 'Bombs',
+          },
+        };
+
+        state.islandsForCharts = {
+          'Treasure Chart 10': 'Windfall Island',
+        };
+
+        Settings.initializeRaw({
+          options: {
+            [Permalink.OPTIONS.RANDOMIZE_CHARTS]: true,
+          },
+        });
+      });
+
+      test('gets the correct item for sunken treasure', () => {
+        const item = state.getItemForChart('Treasure Chart 10');
+
+        expect(item).toBe('Bombs');
+      });
+
+      test('gets nothing for sunken treasure', () => {
+        const item = state.getItemForChart('Treasure Chart 20');
+
+        expect(item).toBe(null);
+      });
+
+      afterAll(() => {
+        Settings.initializeRaw({});
+      });
+    });
+
+    describe('when randomized charts is off', () => {
+      let state;
+
+      beforeAll(() => {
+        state = new TrackerState();
+
+        state.itemsForLocations = {
+          'Tingle Island': {
+            'Sunken Treasure': 'Bombs',
+          },
+        };
+      });
+
+      test('gets the correct item for sunken treasure', () => {
+        const item = state.getItemForChart('Treasure Chart 10');
+
+        expect(item).toBe('Bombs');
+      });
+
+      test('gets nothing for sunken treasure', () => {
+        const item = state.getItemForChart('Treasure Chart 20');
+
+        expect(item).toBe(null);
+      });
     });
   });
 

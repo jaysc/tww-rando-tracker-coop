@@ -2,14 +2,13 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import DatabaseHelper from '../services/database-helper.ts';
+import DatabaseHelper from '../services/database-helper.tsx';
 import DatabaseState from '../services/database-state.ts';
 import LogicCalculation from '../services/logic-calculation';
 import LogicHelper from '../services/logic-helper';
 import Spheres from '../services/spheres';
 import TrackerState from '../services/tracker-state';
 
-import FoundAtTooltip from './found-at-tooltip';
 import Images from './images';
 import KeyDownWrapper from './key-down-wrapper';
 import MapTable from './map-table';
@@ -114,6 +113,9 @@ class ChartList extends React.PureComponent {
       chartName,
     );
 
+    const chartItem = trackerState.getItemForChart();
+    const databaseChartItems = DatabaseHelper.getItemForLocation(databaseState, mappedIslandForChart, 'Sunken Treasure');
+
     let color;
     if (itemCount === 1) {
       color = LogicCalculation.LOCATION_COLORS.CHECKED_LOCATION;
@@ -152,80 +154,21 @@ class ChartList extends React.PureComponent {
       </div>
     );
 
-    const foundAtTooltipContent = !_.isEmpty(locations)
-      ? <FoundAtTooltip locations={locations} spheres={spheres} />
-      : null;
+    const { tooltipContent } = DatabaseHelper.tooltipManager({
+      chartItem,
+      databaseChartItems,
+      databaseLocations,
+      mappedIslandForChart,
+      locations,
+      spheres,
+      trackerState,
+    });
 
-    const chartLeadsTo = isChartMapped ? (
-      <div className="tooltip">
-        <div className="tooltip-title">Chart Leads To</div>
-        <div>{mappedIslandForChart}</div>
-      </div>
-    ) : null;
-
-    const existingLocation = [];
-    let databaseContent;
-    if (!_.isEmpty(databaseLocations)) {
-      const databaseList = _.reduce(databaseLocations, (acc, {
-        generalLocation, detailedLocation,
-      }) => {
-        const locationName = `${generalLocation} | ${detailedLocation}`;
-        if (!_.some(locations, ({
-          generalLocation: existingGeneralLocation,
-          detailedLocation: existingDetailedLocation,
-        }) => generalLocation === existingGeneralLocation
-        && detailedLocation === existingDetailedLocation)
-        && !existingLocation.includes(locationName)) {
-          const sphere = spheres.sphereForLocation(generalLocation, detailedLocation);
-          const sphereText = _.isNil(sphere) ? '?' : sphere;
-
-          existingLocation.push(locationName);
-          acc.push((
-            <li key={locationName}>
-              {`[${sphereText}] ${locationName}`}
-            </li>
-          ));
-        }
-
-        return acc;
-      }, []);
-
-      if (databaseList.length > 0) {
-        databaseContent = (
-          <div className="tooltip item-location">
-            <div className="tooltip-title">Coop Found At</div>
-            <ul>{databaseList}</ul>
-          </div>
-        );
-      }
-    }
-
-    let outerChartElement;
-    if (foundAtTooltipContent || chartLeadsTo || databaseContent) {
-      const tooltipContent = (
-        <>
-          {foundAtTooltipContent}
-          {foundAtTooltipContent && chartLeadsTo && (
-            <div className="tooltip-spacer" />
-          )}
-          {chartLeadsTo}
-          {databaseContent}
-        </>
-      );
-      outerChartElement = (
-        <td key={chartName}>
-          <Tooltip
-            tooltipContent={tooltipContent}
-          >
-            {chartElement}
-          </Tooltip>
-        </td>
-      );
-    } else {
-      outerChartElement = <td key={chartName}>{chartElement}</td>;
-    }
-
-    return outerChartElement;
+    return (
+      <td key={chartName}>
+        <Tooltip tooltipContent={tooltipContent}>{chartElement}</Tooltip>
+      </td>
+    );
   }
 
   render() {

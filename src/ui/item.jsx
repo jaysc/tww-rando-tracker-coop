@@ -2,6 +2,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import DatabaseHelper from '../services/database-helper.tsx';
 import LogicHelper from '../services/logic-helper';
 import Spheres from '../services/spheres';
 
@@ -69,92 +70,20 @@ class Item extends React.PureComponent {
     );
   }
 
-  tooltipCalculation() {
-    const { databaseLocations, locations, spheres } = this.props;
-
-    let locationContent;
-    let databaseContent;
-    const existingLocation = [];
-
-    if (!_.isEmpty(locations)) {
-      const locationsList = _.map(locations, ({
-        generalLocation, detailedLocation,
-      }) => {
-        const sphere = spheres.sphereForLocation(generalLocation, detailedLocation);
-        const sphereText = _.isNil(sphere) ? '?' : sphere;
-        const locationName = `${generalLocation} | ${detailedLocation}`;
-        existingLocation.push(locationName);
-
-        return (
-          <li key={locationName}>
-            {`[${sphereText}] ${locationName}`}
-          </li>
-        );
-      });
-
-      locationContent = (
-        <>
-          <div className="tooltip-title">Locations Found At</div>
-          <ul>{locationsList}</ul>
-        </>
-      );
-    }
-
-    if (!_.isEmpty(databaseLocations)) {
-      const databaseList = _.reduce(databaseLocations, (acc, {
-        generalLocation, detailedLocation,
-      }) => {
-        const sphere = spheres.sphereForLocation(generalLocation, detailedLocation);
-        const sphereText = _.isNil(sphere) ? '?' : sphere;
-        const locationName = `${generalLocation} | ${detailedLocation}`;
-
-        if (!existingLocation.includes(locationName)) {
-          existingLocation.push(locationName);
-          acc.push((
-            <li key={locationName}>
-              {`[${sphereText}] ${locationName}`}
-            </li>
-          ));
-        }
-
-        return acc;
-      }, []);
-
-      if (databaseList.length > 0) {
-        databaseContent = (
-          <>
-            <div className="tooltip-title">Coop Found At</div>
-            <ul>{databaseList}</ul>
-          </>
-        );
-      }
-    }
-
-    return {
-      locationContent,
-      databaseContent,
-    };
-  }
-
   render() {
-    const { locationContent, databaseContent } = this.tooltipCalculation();
+    const { locations, databaseLocations, spheres } = this.props;
 
-    if (locationContent || databaseContent) {
-      const foundAtTooltip = (
-        <div className="tooltip item-location">
-          {locationContent}
-          {databaseContent}
-        </div>
-      );
+    const { databaseLocationContent, tooltipContent } = DatabaseHelper.tooltipManager({
+      databaseLocations,
+      locations,
+      spheres,
+    });
 
-      return (
-        <Tooltip tooltipContent={foundAtTooltip}>
-          {this.item({ databaseContent })}
-        </Tooltip>
-      );
-    }
-
-    return this.item();
+    return (
+      <Tooltip tooltipContent={tooltipContent}>
+        {this.item({ databaseLocationContent })}
+      </Tooltip>
+    );
   }
 }
 

@@ -71,6 +71,8 @@ class LogicHelper {
 
   static DEFEAT_GANONDORF_LOCATION = 'Defeat Ganondorf';
 
+  static SUNKEN_TREASURE_LOCATION = 'Sunken Treasure';
+
   static NUM_TRIFORCE_CHARTS = 8;
 
   static DUNGEONS = Constants.createFromArray(DUNGEONS);

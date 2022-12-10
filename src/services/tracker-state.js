@@ -169,6 +169,18 @@ class TrackerState {
     return newState;
   }
 
+  getItemForChart(chart) {
+    const generalLocation = LogicHelper.isRandomizedChartsSettings()
+      ? this.getIslandFromChartMapping(chart)
+      : LogicHelper.islandForChart(chart);
+
+    return _.get(
+      this.itemsForLocations,
+      [generalLocation, LogicHelper.SUNKEN_TREASURE_LOCATION],
+      null,
+    );
+  }
+
   unsetChartMapping(chartForIsland) {
     const newState = this._clone({ islandsForCharts: true });
 

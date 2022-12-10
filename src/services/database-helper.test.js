@@ -1,4 +1,4 @@
-import DatabaseHelper from './database-helper.ts';
+import DatabaseHelper from './database-helper.tsx';
 import DatabaseLogic from './database-logic.ts';
 import DatabaseState from './database-state.ts';
 import Permalink from './permalink';

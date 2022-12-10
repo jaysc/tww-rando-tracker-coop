@@ -2,7 +2,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import DatabaseHelper from '../services/database-helper.ts';
+import DatabaseHelper from '../services/database-helper.tsx';
 import DatabaseState from '../services/database-state.ts';
 import LogicCalculation from '../services/logic-calculation';
 import LogicHelper from '../services/logic-helper';
@@ -30,105 +30,20 @@ class DetailedLocationsTable extends React.PureComponent {
 
     const itemForLocation = trackerState.getItemForLocation(generalLocation, detailedLocation);
 
-    let requirementsContent;
-    let itemForLocationContent;
-    let databaseItemForLocationContent;
-    let prettyItemName;
-
+    let requirements;
     if (!disableLogic && !isLocationChecked) {
-      const requirements = logic.formattedRequirementsForLocation(
+      requirements = logic.formattedRequirementsForLocation(
         generalLocation,
         detailedLocation,
       );
-
-      const requirementsList = _.map(requirements, (elements, rowIndex) => (
-        <li key={rowIndex}>
-          {
-            _.map(elements, ({ color, text }, elementIndex) => (
-              <span className={color} key={elementIndex}>{text}</span>
-            ))
-          }
-        </li>
-      ));
-
-      requirementsContent = (
-        <>
-          <div className="tooltip-title">Items Required</div>
-          <ul>
-            {requirementsList}
-          </ul>
-        </>
-      );
     }
 
-    if (!_.isNil(itemForLocation)) {
-      prettyItemName = LogicHelper.prettyNameForItem(itemForLocation, null);
-
-      let chartLeadsTo;
-      if (LogicHelper.isRandomizedChart(itemForLocation)) {
-        const mappedIslandForChart = trackerState.getIslandFromChartMapping(itemForLocation);
-        chartLeadsTo = !_.isNil(mappedIslandForChart) ? (
-          <>
-            <div className="tooltip-title">Chart Leads To</div>
-            <div>{mappedIslandForChart}</div>
-          </>
-        ) : null;
-      }
-
-      itemForLocationContent = (
-        <>
-          <div className="tooltip-title">Item at Location</div>
-          <div>{prettyItemName}</div>
-          {chartLeadsTo}
-        </>
-      );
-    }
-
-    if (!_.isNil(databaseItems)) {
-      const databaseItemContent = [];
-      _.forEach(databaseItems, (itemName) => {
-        const databasePrettyItemName = LogicHelper.prettyNameForItem(itemName, null);
-        if (prettyItemName !== databasePrettyItemName) {
-          let chartLeadsTo;
-          if (LogicHelper.isRandomizedChart(itemName)) {
-            const mappedIslandForChart = trackerState.getIslandFromChartMapping(itemName);
-            chartLeadsTo = !_.isNil(mappedIslandForChart) ? (
-              <>
-                <div className="tooltip-title">Chart Leads To</div>
-                <div>{mappedIslandForChart}</div>
-              </>
-            ) : null;
-          }
-
-          databaseItemContent.push((
-            <div key={itemName}>
-              <div>{databasePrettyItemName}</div>
-              {chartLeadsTo}
-            </div>));
-        }
-      });
-
-      if (databaseItemContent.length > 0) {
-        databaseItemForLocationContent = (
-          <>
-            <div className="tooltip-title">Coop Item at Location</div>
-            {databaseItemContent}
-          </>
-        );
-      }
-    }
-
-    if (!itemForLocationContent && !databaseItemForLocationContent && !requirementsContent) {
-      return null;
-    }
-
-    return (
-      <div className="tooltip">
-        {requirementsContent}
-        {itemForLocationContent}
-        {databaseItemForLocationContent}
-      </div>
-    );
+    return DatabaseHelper.tooltipManager({
+      databaseItems,
+      itemForLocation,
+      requirements,
+      trackerState,
+    }).tooltipContent;
   }
 
   detailedLocation(locationInfo, numColumns) {

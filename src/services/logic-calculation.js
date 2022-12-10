@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import KEYS from '../data/keys.json';
 
-import DatabaseHelper from './database-helper.ts';
+import DatabaseHelper from './database-helper.tsx';
 import Locations from './locations';
 import LogicHelper from './logic-helper';
 import Memoizer from './memoizer';
