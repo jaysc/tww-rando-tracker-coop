@@ -474,19 +474,16 @@ export default class DatabaseHelper {
 
   /* istanbul ignore next */
   static isCoopChecked(
+    databaseLocations: { generalLocation: string; detailedLocation: string }[],
     databaseState: DatabaseState,
-    locations,
+    locations: { generalLocation: string; detailedLocation: string }[],
     itemName: string,
     itemCount: number
   ) {
     const databaseMaxCount = this.getMaxCount(databaseState, itemName);
-    const databaseLocations = DatabaseHelper.getLocationsForItem(
-      databaseState,
-      itemName
-    );
 
     return (
-      databaseMaxCount > itemCount || !_.isEqual(locations, databaseLocations)
+      databaseMaxCount > itemCount || (databaseLocations.length > 0 && !_.isEqual(locations, databaseLocations))
     );
   }
 }

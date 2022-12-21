@@ -127,6 +127,7 @@ class ExtraLocation extends React.PureComponent {
     });
 
     const isCoopChecked = DatabaseHelper.isCoopChecked(
+      databaseLocations,
       databaseState,
       locations,
       smallKeyName,
@@ -185,6 +186,7 @@ class ExtraLocation extends React.PureComponent {
     });
 
     const isCoopChecked = DatabaseHelper.isCoopChecked(
+      databaseLocations,
       databaseState,
       locations,
       bigKeyName,

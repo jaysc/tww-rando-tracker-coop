@@ -79,6 +79,7 @@ class ItemsTable extends React.PureComponent {
     });
 
     const isCoopChecked = DatabaseHelper.isCoopChecked(
+      databaseLocations,
       databaseState,
       locations,
       itemName,

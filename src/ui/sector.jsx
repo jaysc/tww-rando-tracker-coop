@@ -68,11 +68,6 @@ class Sector extends React.PureComponent {
 
     const chartCount = trackerState.getItemValue(chartName);
 
-    const databaseMaxCount = DatabaseHelper.getMaxCount(
-      databaseState,
-      chartName,
-    );
-
     const databaseLocations = DatabaseHelper.getLocationsForItem(
       databaseState,
       chartName,
@@ -85,20 +80,43 @@ class Sector extends React.PureComponent {
       locations = trackerState.getLocationsForItem(chartName);
     }
 
+    const chartItem = trackerState.getItemForChart(chartName);
+    const databaseChartItems = DatabaseHelper.getItemForLocation(
+      databaseState,
+      island,
+      LogicHelper.SUNKEN_TREASURE_LOCATION,
+    );
+
+    const isCoopChecked = DatabaseHelper.isCoopChecked(
+      databaseLocations,
+      databaseState,
+      locations,
+      chartName,
+      chartCount,
+    );
+
+    const tooltipContent = DatabaseHelper.tooltipManager({
+      chartItem,
+      databaseChartItems,
+      databaseLocations,
+      locations,
+      spheres,
+    });
+
+    const hasChartItem = databaseChartItems.length > 0 ? 'item' : '';
+
     return (
-      <div className="treasure-chart">
+      <div className={`treasure-chart ${hasChartItem}`}>
         <Item
           clearSelectedItem={clearSelectedItem}
-          databaseLocations={databaseLocations}
-          databaseMaxCount={databaseMaxCount}
           decrementItem={decrementItem}
           images={chartImages}
           incrementItem={incrementItem}
+          isCoopChecked={isCoopChecked}
           itemCount={chartCount}
           itemName={chartName}
-          locations={locations}
           setSelectedItem={setSelectedItem}
-          spheres={spheres}
+          tooltipContent={tooltipContent}
         />
       </div>
     );
@@ -124,25 +142,44 @@ class Sector extends React.PureComponent {
 
     const chartImages = _.get(Images.IMAGES, ['CHARTS', 'Treasure']);
 
-    const databaseMaxCount = DatabaseHelper.getMaxCount(
-      databaseState,
-      chartForIsland,
-    );
-
-    const chartItem = trackerState.getChartFromChartMapping(island);
-
+    const chartName = trackerState.getChartFromChartMapping(island);
     let databaseLocations = [];
-    if (!_.isNil(chartItem)) {
+    if (!_.isNil(chartName)) {
       databaseLocations = DatabaseHelper.getLocationsForItem(
         databaseState,
-        chartItem,
+        chartName,
       );
     }
 
     let locations = [];
     if (trackSpheres) {
-      locations = trackerState.getLocationsForItem(chartItem);
+      locations = trackerState.getLocationsForItem(chartName);
     }
+
+    const chartItem = trackerState.getItemForChart(chartName);
+    const databaseChartItems = DatabaseHelper.getItemForLocation(
+      databaseState,
+      island,
+      LogicHelper.SUNKEN_TREASURE_LOCATION,
+    );
+
+    const isCoopChecked = DatabaseHelper.isCoopChecked(
+      databaseLocations,
+      databaseState,
+      locations,
+      chartName,
+      chartCount,
+    );
+
+    const tooltipContent = DatabaseHelper.tooltipManager({
+      chartItem,
+      databaseChartItems,
+      databaseLocations,
+      locations,
+      spheres,
+    });
+
+    const hasChartItem = databaseChartItems.length > 0 ? 'item' : '';
 
     const updateOpenedChartForIslandFunc = () => {
       if (chartCount > 0) {
@@ -156,18 +193,18 @@ class Sector extends React.PureComponent {
     };
 
     return (
-      <div className="treasure-chart">
+      <div className={`treasure-chart ${hasChartItem}`}>
         <Item
           clearSelectedItem={clearSelectedChartForIsland}
-          databaseLocations={databaseLocations}
-          databaseMaxCount={databaseMaxCount}
           images={chartImages}
           incrementItem={updateOpenedChartForIslandFunc}
+          isCoopChecked={isCoopChecked}
           itemCount={chartCount}
           itemName={chartForIsland}
           locations={locations}
           setSelectedItem={setSelectedChartForIsland}
           spheres={spheres}
+          tooltipContent={tooltipContent}
         />
       </div>
     );
