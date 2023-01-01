@@ -101,6 +101,7 @@ class Sector extends React.PureComponent {
       databaseLocations,
       locations,
       spheres,
+      trackerState,
     });
 
     const hasChartItem = databaseChartItems.length > 0 ? 'item' : '';
@@ -177,6 +178,7 @@ class Sector extends React.PureComponent {
       databaseLocations,
       locations,
       spheres,
+      trackerState,
     });
 
     const hasChartItem = databaseChartItems.length > 0 ? 'item' : '';

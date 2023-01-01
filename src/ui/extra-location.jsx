@@ -124,6 +124,7 @@ class ExtraLocation extends React.PureComponent {
       databaseLocations,
       locations,
       spheres,
+      trackerState,
     });
 
     const isCoopChecked = DatabaseHelper.isCoopChecked(
@@ -183,6 +184,7 @@ class ExtraLocation extends React.PureComponent {
       databaseLocations,
       locations,
       spheres,
+      trackerState,
     });
 
     const isCoopChecked = DatabaseHelper.isCoopChecked(
