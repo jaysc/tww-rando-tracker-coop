@@ -4,6 +4,7 @@ import React from 'react';
 
 import LogicHelper from '../services/logic-helper';
 
+import ContextMenuWrapper from './context-menu-wrapper';
 import KeyDownWrapper from './key-down-wrapper';
 import Tooltip from './tooltip';
 
@@ -50,7 +51,7 @@ class Item extends React.PureComponent {
         className={`item-container ${hasCoopLocation} ${itemClassName}`}
         onBlur={clearSelectedItem}
         onClick={incrementItemFunc}
-        onContextMenu={decrementItemFunc}
+        onContextMenu={ContextMenuWrapper.onRightClick(decrementItemFunc)}
         onFocus={setSelectedItemFunc}
         onKeyDown={KeyDownWrapper.onSpaceKey(incrementItemFunc)}
         onMouseOver={setSelectedItemFunc}

@@ -4,4 +4,4 @@ node_modules
 npm-debug.log
 docs
 .env
-/.vscode
+/.vscode.DS_Store
