@@ -464,10 +464,20 @@ export default class Launcher extends React.PureComponent {
             {this.gameIdContainer()}
           </div>
           <div className="attribution">
-            <span>Maintained by Jaysc/Colfra • Source Code on </span>
+            <span>Maintained by Jaysc/Colfra • Source Code at </span>
             <a href="https://github.com/jaysc/tww-rando-tracker-coop">Github</a>
             <span> • Server code can be found </span>
             <a href="https://github.com/jaysc/tww-rando-tracker-coop-server">here</a>
+            <span> • </span>
+            <a href={`https://github.com/jaysc/tww-rando-tracker-coop/commit/${COMMIT_HASH}`} target="_blank" rel="noreferrer">
+              Version:
+              {' '}
+              {COMMIT_HASH}
+              {' '}
+              (
+              {BUILD_DATE}
+              )
+            </a>
           </div>
           <div className="attribution">
             <span>Based on code by wooferzfg • Source Code on </span>
