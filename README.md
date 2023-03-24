@@ -6,11 +6,16 @@ This tracker is based on source code written by [wooferzfg](https://github.com/w
 
 ## Build Instructions
 
-Building and running the tracker locally requires you to [install Node 18](https://nodejs.org/en/download/).
+Building and running the tracker locally requires you to install [Node 18](https://nodejs.org/en/download/) and [Git](https://git-scm.com/downloads).
 
-After installing Node and cloning the repository, install the required dependencies:
+Clone the repository by running the following in a command prompt:
 ```bash
-npm install
+git clone https://github.com/jaysc/tww-rando-tracker-coop.git
+```
+
+Navigate to the `tww-rando-tracker` folder and install dependencies:
+```bash
+cd tww-rando-tracker && npm install
 ```
 You can then build and serve the tracker application:
 ```bash
@@ -20,4 +25,4 @@ After the server starts, you can go to [localhost:8080](http://localhost:8080/) 
 
 ## Documentation
 
-Code documentation is available at [wooferzfg.me/tww-rando-tracker/docs](https://www.wooferzfg.me/tww-rando-tracker/docs).
+Original code documentation is available at [wooferzfg.me/tww-rando-tracker/docs](https://www.wooferzfg.me/tww-rando-tracker/docs).
