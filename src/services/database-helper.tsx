@@ -1,6 +1,5 @@
 import _ from "lodash";
 import React from "react";
-import Tooltip from "../ui/tooltip";
 
 import DatabaseLogic from "./database-logic";
 import DatabaseState from "./database-state";
@@ -481,10 +480,13 @@ export default class DatabaseHelper {
     itemCount: number
   ) {
     const databaseMaxCount = this.getMaxCount(databaseState, itemName);
+    const itemMaxCount = LogicHelper.maxItemCount(itemName);
 
-    return (
-      databaseMaxCount > itemCount || (databaseLocations.length > 0 && !_.isEqual(locations, databaseLocations))
-    );
+    const checkDatabaseLocations = _.every(databaseLocations, (databaseLocation) => {
+        return !!_.find(locations, (location) => _.isMatch(location,databaseLocation))
+    });
+
+    return databaseMaxCount > itemCount || (itemCount != itemMaxCount && databaseLocations.length > 0 && !checkDatabaseLocations);
   }
 }
 
